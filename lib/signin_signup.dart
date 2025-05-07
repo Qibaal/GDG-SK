@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'home_page.dart';
 
 /// Halaman UI Sign In / Sign Up tanpa autentikasi backend
 class AuthPage extends StatefulWidget {
@@ -76,7 +77,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
 
     // Langsung navigasi ke HomePage
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomePage()),
+      MaterialPageRoute(builder: (_) => Homepage()),
     );
   }
 
@@ -337,22 +338,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
   }
 }
 
-/// Dummy HomePage setelah submit
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
-      body: const Center(
-        child: Text('Welcome to Home Page!'),
-      ),
-    );
-  }
-}
 
 /// Pattern background
 class BackgroundPatternPainter extends CustomPainter {

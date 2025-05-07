@@ -1,6 +1,7 @@
 // Your imports now:
 import 'package:flutter/material.dart';
-import 'package:gemexplora/chat_screen.dart';
+import 'package:gemexplora/chat_screen/chat_screen.dart';
+// import 'package:gemexplora/search_result_page.dart';
 // import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const ChatScreen(),
+      // home: const SearchResultPage(),
     );
   }
 }

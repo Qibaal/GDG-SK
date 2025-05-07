@@ -5,7 +5,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
 }
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({super.key});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -231,7 +231,7 @@ class _ChatScreenState extends State<ChatScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05*255).toInt()),
             blurRadius: 4,
             offset: const Offset(0, -1),
           ),
@@ -258,7 +258,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha((0.5*255).toInt()),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               ),
               textCapitalization: TextCapitalization.sentences,
@@ -294,7 +294,7 @@ class ChatMessage {
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
 
-  const MessageBubble({Key? key, required this.message}) : super(key: key);
+  const MessageBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -329,14 +329,14 @@ class MessageBubble extends StatelessWidget {
                     ? Theme.of(context).colorScheme.primary
                     : isLightMode
                         ? Colors.white
-                        : Theme.of(context).colorScheme.surfaceVariant,
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(20.0).copyWith(
                   bottomRight: message.isUser ? Radius.zero : null,
                   bottomLeft: !message.isUser ? Radius.zero : null,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withAlpha((0.08*255).toInt()),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
@@ -359,7 +359,7 @@ class MessageBubble extends StatelessWidget {
                     _formatTime(message.time),
                     style: TextStyle(
                       color: message.isUser
-                          ? Colors.white.withOpacity(0.7)
+                          ? Colors.white.withAlpha((0.7*255).toInt())
                           : Theme.of(context).textTheme.bodySmall?.color,
                       fontSize: 12.0,
                     ),
@@ -394,7 +394,7 @@ class MessageBubble extends StatelessWidget {
 }
 
 class TypingIndicator extends StatefulWidget {
-  const TypingIndicator({Key? key}) : super(key: key);
+  const TypingIndicator({super.key});
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -441,11 +441,11 @@ class _TypingIndicatorState extends State<TypingIndicator> with SingleTickerProv
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.light
                     ? Colors.white
-                    : Theme.of(context).colorScheme.surfaceVariant,
+                    : Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(20.0),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withAlpha((0.8*255).toInt()),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
@@ -504,6 +504,7 @@ class DelayTween extends Tween<double> {
 }
 
 class SettingsBottomSheet extends StatelessWidget {
+  const SettingsBottomSheet({super.key});
   @override
   Widget build(BuildContext context) {
     return Container(

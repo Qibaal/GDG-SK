@@ -11,7 +11,7 @@ void main() {
 }
 
 class TravelApp extends StatelessWidget {
-  const TravelApp({Key? key}) : super(key: key);
+  const TravelApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class TravelApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();

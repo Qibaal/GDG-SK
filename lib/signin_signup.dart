@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'home_page.dart';
 
-/// Halaman UI Sign In / Sign Up tanpa autentikasi backend
+
 class AuthPage extends StatefulWidget {
-  const AuthPage({Key? key}) : super(key: key);
+  const AuthPage({super.key});
 
   @override
-  _AuthPageState createState() => _AuthPageState();
+  AuthPageState createState() => AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
+class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   bool _isSignIn = true;
   bool _isLoading = false;
@@ -76,9 +75,9 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
     });
 
     // Langsung navigasi ke HomePage
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => Homepage()),
-    );
+    // Navigator.of(context).pushReplacement(
+    //   MaterialPageRoute(builder: (_) => Homepage()),
+    // );
   }
 
   @override
@@ -115,11 +114,6 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.lock_outline,
-                        size: 80,
-                        color: Colors.white,
-                      ),
                       const SizedBox(height: 20),
                       Text(
                         _isSignIn ? 'Welcome Back' : 'Create Account',
@@ -136,7 +130,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                             : 'Sign up to get started',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withAlpha((0.8*255).toInt()),
                         ),
                       ),
                       const SizedBox(height: 40),
@@ -149,10 +143,10 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                           child: Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withAlpha((0.1*255).toInt()),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withAlpha((0.2*255).toInt()),
                               ),
                             ),
                             width: size.width > 600 ? 500 : double.infinity,
@@ -170,11 +164,11 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                                       style: const TextStyle(color: Colors.white),
                                       decoration: InputDecoration(
                                         labelText: 'Email',
-                                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                        labelStyle: TextStyle(color: Colors.white.withAlpha((0.8*255).toInt())),
                                         prefixIcon: const Icon(Icons.email_outlined, color: Colors.white70),
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12),
-                                          borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                                          borderSide: BorderSide(color: Colors.white.withAlpha((0.3*255).toInt()),),
                                         ),
                                         focusedBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12),
@@ -200,7 +194,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                                       style: const TextStyle(color: Colors.white),
                                       decoration: InputDecoration(
                                         labelText: 'Password',
-                                        labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                        labelStyle: TextStyle(color: Colors.white.withAlpha((0.8*255).toInt())),
                                         prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
                                         suffixIcon: IconButton(
                                           icon: Icon(
@@ -211,7 +205,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                                         ),
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12),
-                                          borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                                          borderSide: BorderSide(color: Colors.white.withAlpha((0.8*255).toInt())),
                                         ),
                                         focusedBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12),
@@ -241,11 +235,11 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                                           style: const TextStyle(color: Colors.white),
                                           decoration: InputDecoration(
                                             labelText: 'Confirm Password',
-                                            labelStyle: TextStyle(color: Colors.white.withOpacity(0.8)),
+                                            labelStyle: TextStyle(color: Colors.white.withAlpha((0.8*255).toInt())),
                                             prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
                                             enabledBorder: OutlineInputBorder(
                                               borderRadius: BorderRadius.circular(12),
-                                              borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                                              borderSide: BorderSide(color: Colors.white.withAlpha((0.3*255).toInt())),
                                             ),
                                             focusedBorder: OutlineInputBorder(
                                               borderRadius: BorderRadius.circular(12),
@@ -279,6 +273,7 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                                     
                                     const SizedBox(height: 24),
                                     
+                                    // Sign In/Up Button
                                     ElevatedButton(
                                       onPressed: _isLoading ? null : _submitForm,
                                       style: ElevatedButton.styleFrom(
@@ -304,6 +299,63 @@ class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
+                                    ),
+                                    
+                                    const SizedBox(height: 24),
+                                    Row(
+                                      children: const [
+                                        Expanded(child: Divider(color: Colors.white38, thickness: 1)),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 8),
+                                          child: Text(
+                                            'or Sign In / Sign Up with ',
+                                            style: TextStyle(color: Colors.white70),
+                                          ),
+                                        ),
+                                        Expanded(child: Divider(color: Colors.white38, thickness: 1)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    // Social Buttons with same style as main button
+                                    ElevatedButton.icon(
+                                      onPressed: () {},
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: const Color(0xFF6A11CB),
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        elevation: 0,
+                                      ),
+                                      icon: Image.asset('assets/google.png', height: 24, width: 24),
+                                      label: const Text(
+                                        'Sign in with Google',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    
+                                    const SizedBox(height: 12),
+                                    
+                                    ElevatedButton.icon(
+                                      onPressed: () {},
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: const Color(0xFF6A11CB),
+                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        elevation: 0,
+                                      ),
+                                      icon: Image.asset('assets/apple.png', height: 24, width: 24),
+                                      label: const Text(
+                                        'Sign in with Apple',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                     
                                     const SizedBox(height: 20),
@@ -345,7 +397,7 @@ class BackgroundPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.05)
+      ..color = Colors.white.withAlpha((0.05*255).toInt())
       ..style = PaintingStyle.fill;
     for (int i = 0; i < 20; i++) {
       final radius = (size.width / 12) * (i % 3 + 1);
@@ -358,3 +410,4 @@ class BackgroundPatternPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
+

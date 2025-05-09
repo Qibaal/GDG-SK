@@ -49,8 +49,6 @@ class SearchResultPage extends StatefulWidget {
 
 class _SearchResultPageState extends State<SearchResultPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _selectedTransportIndex = 0;
-  final List<String> _transportOptions = ['Air', 'Land', 'Sea'];
 
   @override
   void initState() {
@@ -79,7 +77,6 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
                   const SizedBox(height: 24),
                   _buildAnswerBox(),
                   _buildDestinationDetails(),
-                  _buildTransportToggle(),
                 ],
               ),
             ),
@@ -460,6 +457,7 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
       decoration: BoxDecoration(
         color: Colors.grey.withAlpha((0.05*255).toInt()),
         borderRadius: BorderRadius.circular(12),
+        
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,67 +510,7 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
     );
   }
 
-  Widget _buildTransportToggle() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              'Transport Preference',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.grey.withAlpha((0.1*255).toInt()),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                _transportOptions.length,
-                (index) => InkWell(
-                  onTap: () {
-                    setState(() {
-                      _selectedTransportIndex = index;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _selectedTransportIndex == index
-                          ? const Color(0xFF1A73E8)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Text(
-                      _transportOptions[index],
-                      style: TextStyle(
-                        color: _selectedTransportIndex == index
-                            ? Colors.white
-                            : Colors.black87,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  
 
   Widget _buildTabView() {
     return Column(

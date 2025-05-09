@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
 
 
-void main() {
-  runApp(const MyApp());
-}
+// void main() {
+//   runApp(const MyApp());
+// }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
 
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         visualDensity: VisualDensity.adaptivePlatformDensity,
+//       ),
+//       home: const AuthScreen(),
+//     );
+//   }
+// }
+
+class AuthPage extends StatefulWidget {
+  const AuthPage({super.key});
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const AuthScreen(),
-    );
-  }
+  AuthPageState createState() => AuthPageState();
 }
 
-class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
-
-  @override
-  AuthScreenState createState() => AuthScreenState();
-}
-
-class AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
+class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
   bool _isLogin = true;
   late AnimationController _animationController;
   late Animation<Offset> _loginSlideAnimation;

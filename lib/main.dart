@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gemexplora/signin_signup.dart';
+import 'package:gemexplora/login_signup.dart';
+import 'package:gemexplora/splash_screen.dart';
 // import 'package:gemexplora/search_result_page.dart';
 // import 'package:firebase_core/firebase_core.dart';
 
@@ -21,7 +22,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthPage(),
+      home: SplashScreen(
+        nextScreen: const AuthPage(),
+        duration: const Duration(seconds: 3),
+      ),
       // home: const SearchResultPage(),
     );
   }

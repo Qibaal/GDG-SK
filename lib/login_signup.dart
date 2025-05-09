@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -11,7 +12,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Travel Planner',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -98,140 +98,94 @@ class AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMi
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+  return Scaffold(
+    body: Center(
+      child: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF43A047),
-              Color(0xFF26A69A),
-              Color(0xFF1E88E5),
-            ],
+          image: DecorationImage(
+            image: AssetImage('assets/shibuya.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  
-                  // Title and app icon
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha((0.1*255).toInt()),
-                          blurRadius: 10,
-                          spreadRadius: 1,
+          child: Center( // Tambahkan Center di sini
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center, // Pastikan posisi vertikal center
+                  children: [
+                    // Logo dan judul bisa tetap di sini
+                    
+                    const SizedBox(height: 30),
+                    
+                    // Form Container dengan design yang fleksibel
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      width: double.infinity,
+                      height: _isLogin ? 500 : 600,
+                      decoration: BoxDecoration(
+                        color: Color(0xAA1A1E35),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Color(0x334A90E2),
+                          width: 1.5,
                         ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.travel_explore,
-                      size: 48,
-                      color: Color(0xFF1E88E5),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // App Title
-                  const Text(
-                    'Trip Planner',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 10),
-                  
-                  // Subtitle that changes based on login/signup state
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      _isLogin 
-                        ? 'Log in to plan your next adventure' 
-                        : 'Join us and start exploring',
-                      key: ValueKey(_isLogin),
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withAlpha((0.9*255).toInt()),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // Form Container with clean design
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha((0.1*255).toInt()),
-                          blurRadius: 10,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Stack(
-                        children: [
-                          // Login Form
-                          SlideTransition(
-                            position: _loginSlideAnimation,
-                            child: FadeTransition(
-                              opacity: _loginOpacityAnimation,
-                              child: LoginForm(
-                                isVisible: _isLogin,
-                                onSignUpPressed: _toggleForm,
-                              ),
-                            ),
-                          ),
-                          
-                          // Sign Up Form
-                          SlideTransition(
-                            position: _signUpSlideAnimation,
-                            child: FadeTransition(
-                              opacity: _signUpOpacityAnimation,
-                              child: SignUpForm(
-                                isVisible: !_isLogin,
-                                onLoginPressed: _toggleForm,
-                              ),
-                            ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha((0.1*255).toInt()),
+                            blurRadius: 10,
+                            spreadRadius: 1,
                           ),
                         ],
                       ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        
+                          child: Stack(
+                            children: [
+                              // Login Form
+                              SlideTransition(
+                                position: _loginSlideAnimation,
+                                child: FadeTransition(
+                                  opacity: _loginOpacityAnimation,
+                                  child: LoginForm(
+                                    isVisible: _isLogin,
+                                    onSignUpPressed: _toggleForm,
+                                  ),
+                                ),
+                              ),
+                              
+                              // Sign Up Form
+                              SlideTransition(
+                                position: _signUpSlideAnimation,
+                                child: FadeTransition(
+                                  opacity: _signUpOpacityAnimation,
+                                  child: SignUpForm(
+                                    isVisible: !_isLogin,
+                                    onLoginPressed: _toggleForm,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        
+                      ),
                     ),
-                  ),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // Social Media Login - moved inside the form container
-                ],
+                    
+                    const SizedBox(height: 30),
+                    // Social Media Login atau konten lainnya
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
 
@@ -273,15 +227,15 @@ class LoginFormState extends State<LoginForm> {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.blue[800],
+              color: Color(0xFFEEF2F7),
             ),
           ),
           const SizedBox(height: 30),
           
-          // Email Input - Simplified design
-          _buildTextField(
+          // Email Input
+          buildTextFormField(
             controller: _emailController,
-            hintText: 'Email',
+            labelText: 'Email',
             icon: Icons.email,
             keyboardType: TextInputType.emailAddress,
           ),
@@ -289,15 +243,15 @@ class LoginFormState extends State<LoginForm> {
           const SizedBox(height: 16),
           
           // Password Input - Simplified design
-          _buildTextField(
+          buildTextFormField(
             controller: _passwordController,
-            hintText: 'Password',
+            labelText: 'Password',
             icon: Icons.lock,
             obscureText: _obscurePassword,
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                color: Colors.grey[600],
+                color: Color(0xFFE0E6FF),
               ),
               onPressed: () {
                 setState(() {
@@ -315,7 +269,7 @@ class LoginFormState extends State<LoginForm> {
                 'Forgot Password?',
                 style: TextStyle(
                   color: Colors.blue[700],
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -355,7 +309,7 @@ class LoginFormState extends State<LoginForm> {
               Text(
                 'Don\'t have an account? ',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: Color(0xFFEEF2F7),
                 ),
               ),
               GestureDetector(
@@ -363,7 +317,7 @@ class LoginFormState extends State<LoginForm> {
                 child: Text(
                   'Sign Up',
                   style: TextStyle(
-                    color: Colors.blue[700],
+                    color: Color(0xFF4A90E2),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -374,88 +328,39 @@ class LoginFormState extends State<LoginForm> {
           const SizedBox(height: 30),
           
           // Or Sign In With section
-          Column(
+          Row(
             children: [
-              Center(
+              Expanded(child: Divider(color: const Color.fromARGB(255, 95, 93, 255), thickness: 1)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   'Or Sign In With',
                   style: TextStyle(
-                    color: Colors.grey[700],
+                    color: Color(0xFFEEF2F7),
                     fontSize: 14,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildSocialButton('assets/google.png'),
-                  const SizedBox(width: 20),
-                  _buildSocialButton('assets/apple.png'),
-                ],
-              ),
+              Expanded(child: Divider(color: const Color.fromARGB(255, 95, 93, 255), thickness: 1)),
+              
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData icon,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-    Widget? suffixIcon,
-  }) {
-    return TextField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        hintText: hintText,
-        prefixIcon: Icon(icon, color: Colors.grey[600]),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: Colors.grey[100],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-    );
-  }
-
-  Widget _buildSocialButton(String imagePath) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((0.1*255).toInt()),
-            blurRadius: 5,
-            spreadRadius: 1,
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              buildSocialButton('assets/google.png'),
+              const SizedBox(width: 20),
+              buildSocialButton('assets/apple.png'),
+            ],
           ),
+              
         ],
-      ),
-      child: Center(
-        child: Image.asset(
-          imagePath,
-          width: 24,
-          height: 24,
-          fit: BoxFit.contain,
-        ),
       ),
     );
   }
+  
 }
-
 class SignUpForm extends StatefulWidget {
   final bool isVisible;
   final VoidCallback onLoginPressed;
@@ -502,15 +407,15 @@ class SignUpFormState extends State<SignUpForm> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
+                color: Color(0xFFEEF2F7),
               ),
             ),
             const SizedBox(height: 30),
             
             // Name Input
-            _buildTextFormField(
+            buildTextFormField(
               controller: _nameController,
-              hintText: 'Full Name',
+              labelText: 'Full Name',
               icon: Icons.person,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -523,9 +428,9 @@ class SignUpFormState extends State<SignUpForm> {
             const SizedBox(height: 16),
             
             // Email Input
-            _buildTextFormField(
+            buildTextFormField(
               controller: _emailController,
-              hintText: 'Email',
+              labelText: 'Email',
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
@@ -542,9 +447,9 @@ class SignUpFormState extends State<SignUpForm> {
             const SizedBox(height: 16),
             
             // Password Input
-            _buildTextFormField(
+            buildTextFormField(
               controller: _passwordController,
-              hintText: 'Password',
+              labelText: 'Password',
               icon: Icons.lock,
               obscureText: _obscurePassword,
               validator: (value) {
@@ -559,7 +464,7 @@ class SignUpFormState extends State<SignUpForm> {
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey[600],
+                  color: Color(0xFFE0E6FF),
                 ),
                 onPressed: () {
                   setState(() {
@@ -572,9 +477,9 @@ class SignUpFormState extends State<SignUpForm> {
             const SizedBox(height: 16),
             
             // Confirm Password Input
-            _buildTextFormField(
+            buildTextFormField(
               controller: _confirmPasswordController,
-              hintText: 'Confirm Password',
+              labelText: 'Confirm Password',
               icon: Icons.lock,
               obscureText: _obscureConfirmPassword,
               validator: (value) {
@@ -589,7 +494,7 @@ class SignUpFormState extends State<SignUpForm> {
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey[600],
+                  color: Color(0xFFE0E6FF),
                 ),
                 onPressed: () {
                   setState(() {
@@ -639,7 +544,7 @@ class SignUpFormState extends State<SignUpForm> {
                 Text(
                   'Already have an account? ',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Color(0xFFEEF2F7),
                   ),
                 ),
                 GestureDetector(
@@ -647,7 +552,7 @@ class SignUpFormState extends State<SignUpForm> {
                   child: Text(
                     'Login',
                     style: TextStyle(
-                      color: Colors.blue[700],
+                      color: Color(0xFF4A90E2),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -658,27 +563,29 @@ class SignUpFormState extends State<SignUpForm> {
             const SizedBox(height: 30),
             
             // Or Sign Up With section
-            Column(
+            Row(
               children: [
-                Center(
+                Expanded(child: Divider(color: const Color.fromARGB(255, 95, 93, 255), thickness: 1)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
                     'Or Sign Up With',
                     style: TextStyle(
-                      color: Colors.grey[700],
+                      color: Color(0xFFEEF2F7),
                       fontSize: 14,
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(width: 20),
-                    _buildSocialButton(Icons.g_mobiledata_rounded, Colors.red),
-                    const SizedBox(width: 20),
-                    _buildSocialButton(Icons.apple, Colors.black),
-                  ],
-                ),
+                Expanded(child: Divider(color: const Color.fromARGB(255, 95, 93, 255), thickness: 1)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildSocialButton('assets/google.png'),
+                const SizedBox(width: 20),
+                buildSocialButton('assets/apple.png'),
               ],
             ),
           ],
@@ -686,10 +593,10 @@ class SignUpFormState extends State<SignUpForm> {
       ),
     );
   }
-
-  Widget _buildTextFormField({
+}
+Widget buildTextFormField({
     required TextEditingController controller,
-    required String hintText,
+    required String labelText,
     required IconData icon,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
@@ -703,46 +610,51 @@ class SignUpFormState extends State<SignUpForm> {
       validator: validator,
       style: const TextStyle(fontSize: 16),
       decoration: InputDecoration(
-        hintText: hintText,
-        prefixIcon: Icon(icon, color: Colors.grey[600]),
+        labelText: labelText,
+        labelStyle: TextStyle(color: Color(0xFFE0E6FF)),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        floatingLabelStyle: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.w500),
+        prefixIcon: Icon(icon, color: Color(0xFFE0E6FF)),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Color(0x40202442),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blue[700]!, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: Colors.red[400]!, width: 1.0),
         ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blue[700]!, width: 1.5),
+        ),
+        
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
       ),
     );
-  }
-
-  Widget _buildSocialButton(IconData icon, Color color) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((0.1*255).toInt()),
-            blurRadius: 5,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Center(
-        child: Icon(
-          icon,
-          color: color,
-          size: 30,
-        ),
-      ),
-    );
-  }
+}
+Widget buildSocialButton(String imagePath) {
+  return ElevatedButton(
+    onPressed: () {
+    },
+    style: ElevatedButton.styleFrom(
+      shape: const CircleBorder(),
+      backgroundColor: Colors.white,
+      padding: const EdgeInsets.all(12),
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.1),
+    ),
+    child: Image.asset(
+      imagePath,
+      width: 30,
+      height: 30,
+      fit: BoxFit.contain,
+    ),
+  );
 }

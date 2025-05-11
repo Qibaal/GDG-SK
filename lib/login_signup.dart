@@ -125,7 +125,7 @@ class AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMi
                     AnimatedContainer(
                       duration: Duration(milliseconds: 300),
                       width: double.infinity,
-                      height: _isLogin ? 500 : 600,
+                      height: _isLogin ? 550 : 650,
                       decoration: BoxDecoration(
                         color: Color(0xAA1A1E35),
                         borderRadius: BorderRadius.circular(20),

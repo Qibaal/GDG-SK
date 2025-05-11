@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gemexplora/login_signup.dart';
 import 'package:gemexplora/splash_screen.dart';
-// import 'package:gemexplora/search_result_page.dart';
 // import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -26,7 +25,6 @@ class MyApp extends StatelessWidget {
         nextScreen: const AuthPage(),
         duration: const Duration(seconds: 3),
       ),
-      // home: const SearchResultPage(),
     );
   }
 }

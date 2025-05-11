@@ -1,277 +1,1153 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+  runApp(const GemExploraApp());
 }
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+var logger = Logger();
+class GemExploraApp extends StatelessWidget {
+  const GemExploraApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AI Chat Interface',
+      title: 'GemExplora',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6750A4),
-          brightness: Brightness.light,
-        ),
-        fontFamily: 'Roboto',
         useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6750A4),
+        colorScheme: ColorScheme.dark(
+          primary: const Color(0xFF14B8A6),
+          secondary: const Color(0xFF10B981),
+          tertiary: const Color(0xFFF59E0B),
+          background: const Color(0xFF042F2E),
+          surface: const Color(0xFF134E4A),
+          onBackground: Colors.white,
+          onSurface: Colors.white,
           brightness: Brightness.dark,
         ),
-        fontFamily: 'Roboto',
-        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFF042F2E),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF042F2E),
+          elevation: 0,
+        ),
+        cardTheme: CardTheme(
+          color: const Color(0xFF115E59),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFF0F766E), width: 1),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF115E59).withOpacity(0.5),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF0F766E)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF0F766E)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF14B8A6), width: 2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          hintStyle: TextStyle(color: const Color(0xFF5EEAD4).withOpacity(0.7)),
+        ),
+        tabBarTheme: TabBarTheme(
+          labelColor: const Color(0xFF042F2E),
+          unselectedLabelColor: const Color(0xFF5EEAD4),
+          indicator: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF14B8A6), Color(0xFF10B981)],
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          dividerColor: Colors.transparent,
+        ),
+        textTheme: const TextTheme(
+          headlineLarge: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          headlineMedium: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          titleLarge: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          titleMedium: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Color(0xFF5EEAD4)),
+        ),
       ),
-      themeMode: ThemeMode.system,
-      home: const ChatScreen(),
+      home: const HomeScreen(),
     );
   }
 }
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+// Home Screen Widget
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color(0xFF042F2E),
+                    const Color(0xFF022C22),
+                  ],
+                ),
+              ),
+            ),
+            NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    pinned: true,
+                    floating: false,
+                    backgroundColor: const Color(0xFF042F2E).withOpacity(0.8),
+                    systemOverlayStyle: SystemUiOverlayStyle.light,
+                    title: Row(
+                      children: [
+                        _buildLogo(),
+                        const SizedBox(width: 8),
+                        ShaderMask(
+                          shaderCallback: (bounds) => const LinearGradient(
+                            colors: [Color(0xFF5EEAD4), Color(0xFF6EE7B7), Color(0xFFFCD34D)],
+                          ).createShader(bounds),
+                          child: const Text(
+                            'GemExplora',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.explore, color: Color(0xFF5EEAD4)),
+                        onPressed: () {},
+                      ),
+                      const SizedBox(width: 8),
+                      CircleAvatar(
+                        backgroundColor: const Color(0xFF0D9488),
+                        radius: 18,
+                        child: const Text(
+                          'FV',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(220),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Welcome back, Traveler',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Where would you like to explore today?',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: const Color(0xFF5EEAD4),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                _buildSearchBar(),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
+                          ),
+                          _buildTabBar(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ];
+              },
+              body: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildTrendingTab(),
+                  _buildFoodTab(),
+                  _buildStaysTab(),
+                  _buildEventsTab(),
+                ],
+              ),
+            ),
+            const Positioned(
+              bottom: 24,
+              right: 24,
+              child: AiAssistantButton(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: Stack(
+        children: [
+          Positioned(
+            top: 4,
+            left: 8,
+            child: Transform.rotate(
+              angle: 0.8,
+              child: Container(
+                width: 16,
+                height: 16,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF14B8A6),
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 12,
+            left: 4,
+            child: Transform.rotate(
+              angle: 0.2,
+              child: Container(
+                width: 16,
+                height: 16,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF10B981),
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 12,
+            left: 12,
+            child: Transform.rotate(
+              angle: -0.2,
+              child: Container(
+                width: 16,
+                height: 16,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF59E0B),
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Stack(
+      children: [
+        TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: 'Search destinations, experiences...',
+            prefixIcon: const Icon(Icons.search, color: Color(0xFF5EEAD4)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+        Positioned(
+          right: 4,
+          top: 4,
+          bottom: 4,
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF59E0B),
+              foregroundColor: const Color(0xFF042F2E),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.auto_awesome, size: 16),
+                SizedBox(width: 4),
+                Text(
+                  'Discover',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF115E59).withOpacity(0.3),
+        border: Border.all(color: const Color(0xFF115E59)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: TabBar(
+        controller: _tabController,
+        tabs: const [
+          Tab(
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.trending_up, size: 16),
+                SizedBox(width: 4),
+                Text('Trending'),
+              ],
+            ),
+          ),
+          Tab(
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.restaurant, size: 16),
+                SizedBox(width: 4),
+                Text('Food'),
+              ],
+            ),
+          ),
+          Tab(
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.hotel, size: 16),
+                SizedBox(width: 4),
+                Text('Stays'),
+              ],
+            ),
+          ),
+          Tab(
+            icon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.event, size: 16),
+                SizedBox(width: 4),
+                Text('Events'),
+              ],
+            ),
+          ),
+        ],
+        padding: const EdgeInsets.all(4),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+      ),
+    );
+  }
+
+  Widget _buildTrendingTab() {
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 100),
+      children: [
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '✨ Trending Now',
+          'Popular destinations travelers are loving',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?bali',
+              'Bali, Indonesia',
+              'Island Paradise',
+              4.8,
+              ['Beach', 'Culture', 'Relaxation'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?kyoto',
+              'Kyoto, Japan',
+              'Historic City',
+              4.9,
+              ['Temples', 'Gardens', 'Tradition'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?santorini',
+              'Santorini, Greece',
+              'Aegean Sea',
+              4.7,
+              ['Views', 'Romance', 'Cuisine'],
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '👨‍👩‍👧‍👦 Family Adventures',
+          'Perfect for kids and parents',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?orlando',
+              'Orlando, USA',
+              'Theme Park Capital',
+              4.6,
+              ['Parks', 'Entertainment', 'Fun'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?tokyo',
+              'Tokyo, Japan',
+              'Modern Metropolis',
+              4.7,
+              ['Disney', 'Technology', 'Culture'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?london',
+              'London, UK',
+              'Historic Capital',
+              4.5,
+              ['Museums', 'Parks', 'History'],
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '💰 Budget-Friendly Gems',
+          'Amazing experiences that won\'t break the bank',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?chiangmai',
+              'Chiang Mai, Thailand',
+              'Northern Thailand',
+              4.6,
+              ['Affordable', 'Culture', 'Food'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?lisbon',
+              'Lisbon, Portugal',
+              'Coastal Capital',
+              4.7,
+              ['Value', 'History', 'Cuisine'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?mexicocity',
+              'Mexico City, Mexico',
+              'Historic Metropolis',
+              4.5,
+              ['Affordable', 'Culture', 'Food'],
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '💎 Hidden Treasures',
+          'Off-the-beaten-path destinations',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?faroeislands',
+              'Faroe Islands',
+              'North Atlantic',
+              4.9,
+              ['Nature', 'Secluded', 'Scenic'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?ljubljana',
+              'Ljubljana, Slovenia',
+              'Central Europe',
+              4.7,
+              ['Charming', 'Green', 'Compact'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?luangprabang',
+              'Luang Prabang, Laos',
+              'Southeast Asia',
+              4.8,
+              ['Temples', 'Peaceful', 'Nature'],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFoodTab() {
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 100),
+      children: [
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '🍽️ Culinary Destinations',
+          'Cities known for exceptional cuisine',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?tokyofood',
+              'Tokyo, Japan',
+              'Culinary Capital',
+              4.9,
+              ['Sushi', 'Ramen', 'Street Food'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?lyonfood',
+              'Lyon, France',
+              'Gastronomic Center',
+              4.8,
+              ['Fine Dining', 'Wine', 'Tradition'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?bangkokfood',
+              'Bangkok, Thailand',
+              'Street Food Paradise',
+              4.7,
+              ['Spicy', 'Markets', 'Variety'],
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '🍷 Wine Regions',
+          'Destinations for wine enthusiasts',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?bordeaux',
+              'Bordeaux, France',
+              'Wine Country',
+              4.9,
+              ['Wine Tours', 'Vineyards', 'Tasting'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?tuscany',
+              'Tuscany, Italy',
+              'Italian Wine Region',
+              4.8,
+              ['Chianti', 'Countryside', 'Cuisine'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?napavalley',
+              'Napa Valley, USA',
+              'California Wine Country',
+              4.7,
+              ['Wineries', 'Tours', 'Gourmet'],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStaysTab() {
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 100),
+      children: [
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '🏨 Unique Accommodations',
+          'One-of-a-kind places to stay',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?treehouse',
+              'Treehouse Lodge',
+              'Amazon, Peru',
+              4.8,
+              ['Unique', 'Nature', 'Adventure'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?icehotel',
+              'Ice Hotel',
+              'Jukkasjärvi, Sweden',
+              4.7,
+              ['Winter', 'Unique', 'Experience'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?underwater',
+              'Underwater Suite',
+              'Maldives',
+              4.9,
+              ['Luxury', 'Marine', 'Exclusive'],
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '🏝️ Overwater Bungalows',
+          'Luxurious stays above crystal waters',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?borabora',
+              'Bora Bora',
+              'French Polynesia',
+              4.9,
+              ['Luxury', 'Romance', 'Views'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?maldives',
+              'Maldives',
+              'Indian Ocean',
+              4.8,
+              ['Private', 'Beaches', 'Snorkeling'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?fiji',
+              'Fiji',
+              'South Pacific',
+              4.7,
+              ['Island', 'Culture', 'Relaxation'],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEventsTab() {
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 100),
+      children: [
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '🎭 Cultural Festivals',
+          'Celebrations around the world',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?carnival',
+              'Carnival',
+              'Rio de Janeiro, Brazil',
+              4.9,
+              ['Festival', 'Music', 'Dance'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?diwali',
+              'Diwali',
+              'India',
+              4.8,
+              ['Lights', 'Celebration', 'Culture'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?oktoberfest',
+              'Oktoberfest',
+              'Munich, Germany',
+              4.7,
+              ['Beer', 'Food', 'Tradition'],
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildCategorySection(
+          '🎵 Music Festivals',
+          'Unforgettable musical experiences',
+          [
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?coachella',
+              'Coachella',
+              'California, USA',
+              4.7,
+              ['Music', 'Art', 'Fashion'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?glastonbury',
+              'Glastonbury',
+              'Somerset, UK',
+              4.8,
+              ['Music', 'Camping', 'Culture'],
+            ),
+            _buildDestinationCard(
+              'https://source.unsplash.com/random/300x200/?tomorrowland',
+              'Tomorrowland',
+              'Boom, Belgium',
+              4.9,
+              ['EDM', 'Production', 'International'],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // Helper method to build a category section
+  Widget _buildCategorySection(String title, String description, List<Widget> children) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF5EEAD4),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 280,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: children,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build a destination card
+  Widget _buildDestinationCard(
+    String imageUrl,
+    String title,
+    String location,
+    double rating,
+    List<String> tags,
+  ) {
+    return Container(
+      width: 280,
+      margin: const EdgeInsets.only(right: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFF115E59).withOpacity(0.7),
+            const Color(0xFF065F46).withOpacity(0.7),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF0F766E)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF14B8A6).withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                SizedBox(
+                  height: 160,
+                  width: double.infinity,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: const Color(0xFF115E59),
+                        child: const Center(
+                          child: Icon(Icons.image, size: 50, color: Color(0xFF5EEAD4)),
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: const Color(0xFF115E59),
+                        child: const Center(
+                          child: CircularProgressIndicator(color: Color(0xFF5EEAD4)),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          size: 14,
+                          color: Color(0xFF042F2E),
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          rating.toString(),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF042F2E),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: Color(0xFF5EEAD4),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        location,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF5EEAD4),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: tags.map((tag) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF115E59).withOpacity(0.5),
+                          border: Border.all(color: const Color(0xFF0F766E)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          tag,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF5EEAD4),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// AI Assistant Button and Sheet
+class AiAssistantButton extends StatelessWidget {
+  const AiAssistantButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => const AiAssistantSheet(),
+        );
+      },
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF14B8A6), Color(0xFF10B981)],
+          ),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF042F2E).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Icon(
+            Icons.auto_awesome,
+            color: Color(0xFF042F2E),
+            size: 24,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AiAssistantSheet extends StatefulWidget {
+  const AiAssistantSheet({super.key});
+
+  @override
+  State<AiAssistantSheet> createState() => _AiAssistantSheetState();
+}
+
+class _AiAssistantSheetState extends State<AiAssistantSheet> {
   final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  final List<ChatMessage> _messages = [];
-  bool _isTyping = false;
+  final List<ChatMessage> _messages = [
+    ChatMessage(
+      text: "Hi there! I'm your GemExplora AI assistant powered by Google Gemini. Ask me about destinations, travel tips, or recommendations!",
+      isUser: false,
+    ),
+  ];
 
   @override
   void dispose() {
     _messageController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
-  void _handleSubmitted(String text) {
-    _messageController.clear();
-    if (text.trim().isEmpty) return;
-    
+  void _handleSend() {
+    if (_messageController.text.trim().isEmpty) return;
+
     setState(() {
       _messages.add(ChatMessage(
-        text: text,
+        text: _messageController.text,
         isUser: true,
-        time: DateTime.now(),
       ));
-      _isTyping = true;
     });
-    
-    _scrollToBottom();
 
-    // Simulate AI response after a delay
-    Future.delayed(const Duration(milliseconds: 1200), () {
-      if (!mounted) return;
-      setState(() {
-        _isTyping = false;
-        _messages.add(ChatMessage(
-          text: _generateResponse(text),
-          isUser: false,
-          time: DateTime.now(),
-        ));
-      });
-      _scrollToBottom();
-    });
-  }
+    final userMessage = _messageController.text;
+    _messageController.clear();
 
-  String _generateResponse(String text) {
-    // Simple response generation, replace with actual AI response logic
-    if (text.toLowerCase().contains('hello') || text.toLowerCase().contains('hi')) {
-      return 'Hello! How can I assist you today?';
-    } else if (text.toLowerCase().contains('help')) {
-      return 'I\'m here to help! What do you need assistance with?';
-    } else if (text.toLowerCase().contains('thanks') || text.toLowerCase().contains('thank you')) {
-      return 'You\'re welcome! Is there anything else you\'d like to know?';
-    } else if (text.toLowerCase().contains('bye')) {
-      return 'Goodbye! Feel free to return if you have more questions!';
-    } else {
-      return 'That\'s an interesting point. Would you like to know more about this topic?';
-    }
-  }
-
-  void _scrollToBottom() {
-    // Use Future.delayed to ensure the scroll happens after the UI updates
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+    // Simulate AI response (in a real app, this would call the Gemini API)
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text: "I'd be happy to help you explore more about \"$userMessage\". Here's what I found.",
+            isUser: false,
+          ));
+        });
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    final isLightMode = brightness == Brightness.light;
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Chat Assistant'),
-        centerTitle: true,
-        elevation: 1,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) => SettingsBottomSheet(),
-              );
-            },
-          ),
-        ],
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.8,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF042F2E), Color(0xFF022C22)],
+        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: const Color(0xFF0F766E)),
       ),
-      body: Column(
+      child: Column(
         children: [
+          _buildHeader(),
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: isLightMode ? Colors.grey[100] : Colors.grey[900],
-              ),
-              child: _messages.isEmpty
-                  ? _buildWelcomeScreen()
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.all(8.0),
-                      itemCount: _messages.length,
-                      itemBuilder: (_, index) {
-                        return MessageBubble(message: _messages[index]);
-                      },
-                    ),
-            ),
+            child: _buildMessageList(),
           ),
-          if (_isTyping)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              alignment: Alignment.centerLeft,
-              child: TypingIndicator(),
-            ),
-          _buildMessageComposer(),
+          _buildInputArea(),
         ],
       ),
     );
   }
 
-  Widget _buildWelcomeScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Color(0xFF0F766E)),
+        ),
+      ),
+      child: Row(
         children: [
-          const CircleAvatar(
-            radius: 50,
-            backgroundColor: Color(0xFF6750A4),
-            child: Icon(
-              Icons.smart_toy_outlined,
-              size: 60,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF14B8A6), Color(0xFF10B981)],
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(
+              Icons.auto_awesome,
+              color: Color(0xFF042F2E),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Text(
+            'Gemini Travel Assistant',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'Welcome to AI Assistant',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'Ask me anything to get started!',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                _suggestionChip('Hello AI!'),
-                _suggestionChip('Tell me a joke'),
-                _suggestionChip('What can you do?'),
-                _suggestionChip('Help me with coding'),
-              ],
-            ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.close, color: Color(0xFF5EEAD4)),
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ],
       ),
     );
   }
 
-  Widget _suggestionChip(String text) {
-    return ActionChip(
-      label: Text(text),
-      onPressed: () {
-        _handleSubmitted(text);
+  Widget _buildMessageList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _messages.length,
+      reverse: false,
+      itemBuilder: (context, index) {
+        final message = _messages[index];
+        return Align(
+          alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.8,
+            ),
+            decoration: BoxDecoration(
+              color: message.isUser
+                  ? const Color(0xFFF59E0B)
+                  : const Color(0xFF115E59).withOpacity(0.5),
+              borderRadius: BorderRadius.circular(16),
+              border: message.isUser
+                  ? null
+                  : Border.all(color: const Color(0xFF0F766E)),
+            ),
+            child: Text(
+              message.text,
+              style: TextStyle(
+                color: message.isUser ? const Color(0xFF042F2E) : Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        );
       },
     );
   }
 
-  Widget _buildMessageComposer() {
+  Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha((0.05*255).toInt()),
-            blurRadius: 4,
-            offset: const Offset(0, -1),
-          ),
-        ],
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Color(0xFF0F766E)),
+        ),
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.attach_file_outlined),
-            onPressed: () {
-              // Implement file attachment
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('File attachment coming soon')),
-              );
-            },
-          ),
           Expanded(
             child: TextField(
               controller: _messageController,
               decoration: InputDecoration(
-                hintText: 'Message...',
+                hintText: 'Ask about destinations, food, or activities...',
+                hintStyle: TextStyle(color: const Color(0xFF5EEAD4).withOpacity(0.7)),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24.0),
-                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: const BorderSide(color: Color(0xFF0F766E)),
                 ),
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha((0.5*255).toInt()),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: null,
-              onSubmitted: _handleSubmitted,
+              style: const TextStyle(color: Colors.white),
+              onSubmitted: (_) => _handleSend(),
             ),
           ),
-          const SizedBox(width: 8.0),
-          FloatingActionButton(
-            onPressed: () => _handleSubmitted(_messageController.text),
-            elevation: 2,
-            mini: true,
-            child: const Icon(Icons.send),
+          const SizedBox(width: 8),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+              ),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.send, color: Color(0xFF042F2E)),
+              onPressed: _handleSend,
+            ),
           ),
         ],
       ),
@@ -282,296 +1158,177 @@ class _ChatScreenState extends State<ChatScreen> {
 class ChatMessage {
   final String text;
   final bool isUser;
-  final DateTime time;
 
-  ChatMessage({
-    required this.text,
-    required this.isUser,
-    required this.time,
-  });
+  ChatMessage({required this.text, required this.isUser});
 }
 
-class MessageBubble extends StatelessWidget {
-  final ChatMessage message;
-
-  const MessageBubble({super.key, required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    final isLightMode = Theme.of(context).brightness == Brightness.light;
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (!message.isUser)
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              radius: 16,
-              child: const Icon(
-                Icons.smart_toy_outlined,
-                size: 16,
-                color: Colors.white,
-              ),
-            ),
-          if (!message.isUser) const SizedBox(width: 8.0),
-          
-          Flexible(
-            child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.75,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              decoration: BoxDecoration(
-                color: message.isUser
-                    ? Theme.of(context).colorScheme.primary
-                    : isLightMode
-                        ? Colors.white
-                        : Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(20.0).copyWith(
-                  bottomRight: message.isUser ? Radius.zero : null,
-                  bottomLeft: !message.isUser ? Radius.zero : null,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha((0.08*255).toInt()),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    message.text,
-                    style: TextStyle(
-                      color: message.isUser
-                          ? Colors.white
-                          : Theme.of(context).textTheme.bodyLarge?.color,
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    _formatTime(message.time),
-                    style: TextStyle(
-                      color: message.isUser
-                          ? Colors.white.withAlpha((0.7*255).toInt())
-                          : Theme.of(context).textTheme.bodySmall?.color,
-                      fontSize: 12.0,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          if (message.isUser) const SizedBox(width: 8.0),
-          if (message.isUser)
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              radius: 16,
-              child: const Icon(
-                Icons.person,
-                size: 16,
-                color: Colors.white,
-              ),
-            ),
-        ],
-      ),
-    );
+// Firebase Service
+class FirebaseService {
+  // This would normally connect to Firebase
+  // For this example, we're just providing the structure
+  
+  static Future<void> initialize() async {
+    // Initialize Firebase
+    logger.i('Firebase initialized');
   }
 
-  String _formatTime(DateTime time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
-}
-
-class TypingIndicator extends StatefulWidget {
-  const TypingIndicator({super.key});
-
-  @override
-  State<TypingIndicator> createState() => _TypingIndicatorState();
-}
-
-class _TypingIndicatorState extends State<TypingIndicator> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
+  static Future<Map<String, dynamic>?> signInWithEmail(String email, String password) async {
+    // Simulate authentication
+    await Future.delayed(const Duration(seconds: 1));
+    return {
+      'uid': 'user123',
+      'email': email,
+      'displayName': 'Traveler',
+    };
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  static Future<void> signOut() async {
+    // Simulate sign out
+    await Future.delayed(const Duration(milliseconds: 500));
+    logger.i('User signed out');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (_, __) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              radius: 16,
-              child: const Icon(
-                Icons.smart_toy_outlined,
-                size: 16,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 8.0),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.light
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(20.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha((0.8*255).toInt()),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: List.generate(
-                  3,
-                  (index) => _buildDot(index * 0.3),
-                ),
-              ),
-            ),
-          ],
-        );
+  static Future<List<Map<String, dynamic>>> getDestinations() async {
+    // Simulate fetching destinations from Firestore
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      {
+        'id': 'dest1',
+        'title': 'Bali, Indonesia',
+        'location': 'Island Paradise',
+        'rating': 4.8,
+        'tags': ['Beach', 'Culture', 'Relaxation'],
+        'imageUrl': 'https://source.unsplash.com/random/300x200/?bali',
       },
-    );
-  }
-
-  Widget _buildDot(double delay) {
-    final delayedAnimation = DelayTween(
-      begin: 0.0,
-      end: 1.0,
-      delay: delay,
-    ).animate(_controller);
-
-    return AnimatedBuilder(
-      animation: delayedAnimation,
-      builder: (context, child) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 2.0),
-          height: 8.0 * (0.5 + delayedAnimation.value * 0.5),
-          width: 8.0 * (0.5 + delayedAnimation.value * 0.5),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5 + delayedAnimation.value * 0.5),
-            shape: BoxShape.circle,
-          ),
-        );
+      {
+        'id': 'dest2',
+        'title': 'Kyoto, Japan',
+        'location': 'Historic City',
+        'rating': 4.9,
+        'tags': ['Temples', 'Gardens', 'Tradition'],
+        'imageUrl': 'https://source.unsplash.com/random/300x200/?kyoto',
       },
-    );
+      // More destinations would be here
+    ];
+  }
+
+  static Future<Map<String, dynamic>?> getDestinationDetails(String destinationId) async {
+    // Simulate fetching destination details
+    await Future.delayed(const Duration(seconds: 1));
+    return {
+      'id': destinationId,
+      'title': 'Bali, Indonesia',
+      'location': 'Island Paradise',
+      'description': 'Bali is a living postcard, an Indonesian paradise that feels like a fantasy.',
+      'rating': 4.8,
+      'tags': ['Beach', 'Culture', 'Relaxation'],
+      'imageUrl': 'https://source.unsplash.com/random/600x400/?bali',
+      'attractions': [
+        'Ubud Monkey Forest',
+        'Tanah Lot Temple',
+        'Tegallalang Rice Terraces',
+      ],
+      'hotels': [
+        {
+          'name': 'Four Seasons Resort Bali',
+          'rating': 5.0,
+          'priceRange': '\$\$\$\$',
+        },
+        {
+          'name': 'Padma Resort Ubud',
+          'rating': 4.7,
+          'priceRange': '\$\$\$',
+        },
+      ],
+      'restaurants': [
+        {
+          'name': 'Locavore',
+          'cuisine': 'Contemporary',
+          'rating': 4.8,
+        },
+        {
+          'name': 'Warung Babi Guling Ibu Oka',
+          'cuisine': 'Balinese',
+          'rating': 4.6,
+        },
+      ],
+    };
+  }
+
+  static Future<void> saveUserPreferences(String userId, Map<String, dynamic> preferences) async {
+    // Simulate saving user preferences
+    await Future.delayed(const Duration(milliseconds: 500));
+    logger.i('Saved preferences for user $userId: $preferences');
   }
 }
 
-class DelayTween extends Tween<double> {
-  final double delay;
+// Gemini AI Service
+class GeminiService {
+  final String apiKey;
+  final String baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
+  final String model = 'gemini-pro';
 
-  DelayTween({
-    required this.delay,
-    required double begin,
-    required double end,
-  }) : super(begin: begin, end: end);
+  GeminiService({required this.apiKey});
 
-  @override
-  double lerp(double t) {
-    return super.lerp((t - delay).clamp(0.0, 1.0));
+  Future<String> generateResponse(String prompt) async {
+    try {
+      // In a real app, this would make an actual API call to Google's Gemini API
+      // For this example, we're simulating the response
+      
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Simulate different responses based on prompt keywords
+      if (prompt.toLowerCase().contains('bali')) {
+        return 'Bali is a beautiful Indonesian island known for its lush landscapes, vibrant culture, and stunning beaches. The best time to visit is during the dry season (April to October). Don\'t miss the sacred Monkey Forest, Tanah Lot temple, and the rice terraces of Tegallalang.';
+      } else if (prompt.toLowerCase().contains('food') || prompt.toLowerCase().contains('cuisine')) {
+        return 'For amazing culinary experiences, I recommend Tokyo (Japan), Bangkok (Thailand), and Lyon (France). Each offers unique flavors and dining traditions. In Tokyo, try sushi at Tsukiji Market. Bangkok street food scene is unmatched - visit Chinatown for the best experience. Lyon is considered France gastronomic capital with traditional bouchons serving local specialties.';
+      } else if (prompt.toLowerCase().contains('budget') || prompt.toLowerCase().contains('cheap')) {
+        return 'For budget-friendly travel, consider Southeast Asia (Thailand, Vietnam, Indonesia), Eastern Europe (Hungary, Poland, Romania), or Latin America (Mexico, Colombia, Peru). These destinations offer great value with affordable accommodations, food, and activities while providing rich cultural experiences.';
+      } else {
+        return 'I\'d be happy to help you plan your perfect trip! I can provide recommendations for destinations, accommodations, activities, and local cuisine based on your preferences. Just let me know what you\'re interested in exploring!';
+      }
+    } catch (e) {
+      logger.i('Exception: $e');
+      return 'Sorry, I encountered an error. Please try again later.';
+    }
   }
-}
 
-class SettingsBottomSheet extends StatelessWidget {
-  const SettingsBottomSheet({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.settings),
-              const SizedBox(width: 16.0),
-              const Text(
-                'Settings',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.color_lens_outlined),
-            title: const Text('Appearance'),
-            subtitle: const Text('Light & Dark mode'),
-            onTap: () {
-              // Implement theme switching
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Theme settings coming soon')),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_outline),
-            title: const Text('Clear History'),
-            onTap: () {
-              Navigator.pop(context);
-              // Implement clear chat history
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Chat history cleared')),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('About'),
-            onTap: () {
-              Navigator.pop(context);
-              showAboutDialog(
-                context: context,
-                applicationName: 'AI Chat Assistant',
-                applicationVersion: '1.0.0',
-                applicationIcon: const Icon(Icons.smart_toy_outlined),
-                children: [
-                  const Text('A beautiful Flutter AI Chat interface'),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
+  Future<List<Map<String, dynamic>>> getDestinationRecommendations(
+      String userPreferences, int limit) async {
+    try {
+      // Simulate AI-generated recommendations
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // This would normally call the Gemini API and parse the response
+      return [
+        {
+          "title": "Kyoto, Japan",
+          "location": "Kansai Region, Japan",
+          "description": "Ancient capital with over 1,600 Buddhist temples and 400 Shinto shrines",
+          "rating": 4.9,
+          "tags": ["Culture", "History", "Temples"],
+          "highlights": ["Fushimi Inari Shrine", "Arashiyama Bamboo Grove", "Kinkaku-ji"]
+        },
+        {
+          "title": "Porto, Portugal",
+          "location": "Northern Portugal",
+          "description": "Coastal city known for port wine, stunning bridges and colorful historic center",
+          "rating": 4.7,
+          "tags": ["Wine", "Architecture", "Affordable"],
+          "highlights": ["Ribeira District", "Port Wine Cellars", "Dom Luís I Bridge"]
+        },
+        {
+          "title": "Chiang Mai, Thailand",
+          "location": "Northern Thailand",
+          "description": "Cultural hub with ancient temples, night markets and mountain scenery",
+          "rating": 4.8,
+          "tags": ["Budget", "Culture", "Food"],
+          "highlights": ["Sunday Night Market", "Doi Suthep", "Elephant Sanctuaries"]
+        }
+      ];
+    } catch (e) {
+      logger.i('Exception in getDestinationRecommendations: $e');
+      return [];
+    }
   }
 }

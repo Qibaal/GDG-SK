@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:gemexplora/chat_screen.dart';
 
+// void main() {
+//   runApp(const MyApp());
+// }
 
-void main() {
-  runApp(const MyApp());
-}
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         visualDensity: VisualDensity.adaptivePlatformDensity,
+//       ),
+//       home: const AuthScreen(),
+//     );
+//   }
+// }
 
+class AuthPage extends StatefulWidget {
+  const AuthPage({super.key});
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const AuthScreen(),
-    );
-  }
+  AuthPageState createState() => AuthPageState();
 }
 
-class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
-
-  @override
-  AuthScreenState createState() => AuthScreenState();
-}
-
-class AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
+class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
   bool _isLogin = true;
   late AnimationController _animationController;
   late Animation<Offset> _loginSlideAnimation;
@@ -282,7 +283,28 @@ class LoginFormState extends State<LoginForm> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                final email = _emailController.text;
+                final password = _passwordController.text;
+
+                final url = Uri.parse('http://localhost:8080/login');
+                final response = await http.post(
+                  url,
+                  headers: {'Content-Type': 'application/json'},
+                  body: jsonEncode({'email': email, 'password': password}),
+                );
+
+                if (response.statusCode >= 200 && response.statusCode < 300) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()), // Or HomeScreen()
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Login failed: ${response.body}')),
+                  );
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[700],
                 shape: RoundedRectangleBorder(
@@ -393,6 +415,30 @@ class SignUpFormState extends State<SignUpForm> {
     super.dispose();
   }
 
+  Future<void> _registerUser() async {
+    final url = Uri.parse('http://localhost:8080/register'); // Replace with your local IP if on device
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': _nameController.text,
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      }),
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration successful. Please log in.')),
+      );
+      widget.onLoginPressed(); // This switches to login view
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration failed: ${response.body}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -411,54 +457,41 @@ class SignUpFormState extends State<SignUpForm> {
               ),
             ),
             const SizedBox(height: 30),
-            
-            // Name Input
+
             buildTextFormField(
               controller: _nameController,
               labelText: 'Full Name',
               icon: Icons.person,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your name';
-                }
-                return null;
-              },
+              validator: (value) =>
+                  value == null || value.isEmpty ? 'Please enter your name' : null,
             ),
-            
+
             const SizedBox(height: 16),
-            
-            // Email Input
+
             buildTextFormField(
               controller: _emailController,
               labelText: 'Email',
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
+                if (value == null || value.isEmpty) return 'Please enter your email';
                 if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                   return 'Please enter a valid email';
                 }
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
-            // Password Input
+
             buildTextFormField(
               controller: _passwordController,
               labelText: 'Password',
               icon: Icons.lock,
               obscureText: _obscurePassword,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a password';
-                }
-                if (value.length < 6) {
-                  return 'Password should be at least 6 characters';
-                }
+                if (value == null || value.isEmpty) return 'Please enter a password';
+                if (value.length < 6) return 'Password should be at least 6 characters';
                 return null;
               },
               suffixIcon: IconButton(
@@ -466,29 +499,20 @@ class SignUpFormState extends State<SignUpForm> {
                   _obscurePassword ? Icons.visibility_off : Icons.visibility,
                   color: Color(0xFFE0E6FF),
                 ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
+                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
-            // Confirm Password Input
+
             buildTextFormField(
               controller: _confirmPasswordController,
               labelText: 'Confirm Password',
               icon: Icons.lock,
               obscureText: _obscureConfirmPassword,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please confirm your password';
-                }
-                if (value != _passwordController.text) {
-                  return 'Passwords do not match';
-                }
+                if (value == null || value.isEmpty) return 'Please confirm your password';
+                if (value != _passwordController.text) return 'Passwords do not match';
                 return null;
               },
               suffixIcon: IconButton(
@@ -496,26 +520,19 @@ class SignUpFormState extends State<SignUpForm> {
                   _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
                   color: Color(0xFFE0E6FF),
                 ),
-                onPressed: () {
-                  setState(() {
-                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                  });
-                },
+                onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
-            // Sign Up Button
+
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Sign Up')),
-                    );
+                    _registerUser();
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -534,52 +551,37 @@ class SignUpFormState extends State<SignUpForm> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 25),
-            
-            // Already have an account text
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'Already have an account? ',
-                  style: TextStyle(
-                    color: Color(0xFFEEF2F7),
-                  ),
-                ),
+                Text('Already have an account? ', style: TextStyle(color: Color(0xFFEEF2F7))),
                 GestureDetector(
                   onTap: widget.onLoginPressed,
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                      color: Color(0xFF4A90E2),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: Text('Login',
+                      style: TextStyle(color: Color(0xFF4A90E2), fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 30),
-            
-            // Or Sign Up With section
+
             Row(
               children: [
-                Expanded(child: Divider(color: const Color.fromARGB(255, 95, 93, 255), thickness: 1)),
+                Expanded(child: Divider(color: Color.fromARGB(255, 95, 93, 255), thickness: 1)),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    'Or Sign Up With',
-                    style: TextStyle(
-                      color: Color(0xFFEEF2F7),
-                      fontSize: 14,
-                    ),
-                  ),
+                  child: Text('Or Sign Up With',
+                      style: TextStyle(color: Color(0xFFEEF2F7), fontSize: 14)),
                 ),
-                Expanded(child: Divider(color: const Color.fromARGB(255, 95, 93, 255), thickness: 1)),
+                Expanded(child: Divider(color: Color.fromARGB(255, 95, 93, 255), thickness: 1)),
               ],
             ),
+
             const SizedBox(height: 20),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -594,6 +596,7 @@ class SignUpFormState extends State<SignUpForm> {
     );
   }
 }
+
 Widget buildTextFormField({
     required TextEditingController controller,
     required String labelText,

@@ -126,7 +126,7 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
                     AnimatedContainer(
                       duration: Duration(milliseconds: 300),
                       width: double.infinity,
-                      height: _isLogin ? 550 : 650,
+                      height: _isLogin ? 530 : 650,
                       decoration: BoxDecoration(
                         color: Color(0xAA1A1E35),
                         borderRadius: BorderRadius.circular(20),
@@ -611,7 +611,10 @@ Widget buildTextFormField({
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
-      style: const TextStyle(fontSize: 16),
+      style: const TextStyle(
+        fontSize: 16,
+        color: Color(0xFFE0E6FF),
+      ),
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(color: Color(0xFFE0E6FF)),

@@ -1,27 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:gemexplora/chat_screen.dart';
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//         visualDensity: VisualDensity.adaptivePlatformDensity,
-//       ),
-//       home: const AuthScreen(),
-//     );
-//   }
-// }
+import 'package:gemexplora/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -278,30 +258,28 @@ class LoginFormState extends State<LoginForm> {
           
           const SizedBox(height: 20),
           
-          // Login Button - Simplified style
           SizedBox(
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
               onPressed: () async {
-                final email = _emailController.text;
-                final password = _passwordController.text;
+                final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-                final url = Uri.parse('http://localhost:8080/login');
-                final response = await http.post(
-                  url,
-                  headers: {'Content-Type': 'application/json'},
-                  body: jsonEncode({'email': email, 'password': password}),
-                );
+                final email = _emailController.text.trim();
+                final password = _passwordController.text.trim();
 
-                if (response.statusCode >= 200 && response.statusCode < 300) {
+                final success = await authProvider.login(email, password);
+
+                if (success) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()), // Or HomeScreen()
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Login failed: ${response.body}')),
+                    SnackBar(
+                      content: Text(authProvider.errorMessage ?? 'Login failed'),
+                    ),
                   );
                 }
               },
@@ -415,29 +393,54 @@ class SignUpFormState extends State<SignUpForm> {
     super.dispose();
   }
 
-  Future<void> _registerUser() async {
-    final url = Uri.parse('http://localhost:8080/register'); // Replace with your local IP if on device
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'name': _nameController.text,
-        'email': _emailController.text,
-        'password': _passwordController.text,
-      }),
-    );
+  // Future<void> _registerUser() async {
+  //   final url = Uri.parse('http://localhost:8080/register');
+  //   final response = await http.post(
+  //     url,
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       'name': _nameController.text,
+  //       'email': _emailController.text,
+  //       'password': _passwordController.text,
+  //     }),
+  //   );
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful. Please log in.')),
-      );
-      widget.onLoginPressed(); // This switches to login view
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed: ${response.body}')),
-      );
-    }
-  }
+  //   if (response.statusCode >= 200 && response.statusCode < 300) {
+  //     // Auto-login after successful registration
+  //     final loginUrl = Uri.parse('http://localhost:8080/login');
+  //     final loginResponse = await http.post(
+  //       loginUrl,
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode({
+  //         'email': _emailController.text,
+  //         'password': _passwordController.text,
+  //       }),
+  //     );
+
+  //     final data = jsonDecode(loginResponse.body);
+
+  //     if (loginResponse.statusCode >= 200 && data['token'] != null) {
+  //       final prefs = await SharedPreferences.getInstance();
+  //       await prefs.setString('token', data['token']);
+  //       await prefs.setString('user', jsonEncode(data['user']));
+  //       print('Stored sign in token = ${prefs.getString('token')}');
+
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const HomeScreen()),
+  //       );
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Login after registration failed: ${data['message'] ?? 'Unknown error'}')),
+  //       );
+  //     }
+  //   } else {
+  //     final data = jsonDecode(response.body);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Registration failed: ${data['message'] ?? 'Unknown error'}')),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -530,9 +533,26 @@ class SignUpFormState extends State<SignUpForm> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    _registerUser();
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+                    final success = await authProvider.register(
+                      name: _nameController.text,
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    );
+
+                    if (success) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(authProvider.errorMessage ?? 'Registration failed')),
+                      );
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(

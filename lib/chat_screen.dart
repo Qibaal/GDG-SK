@@ -1,3 +1,5 @@
+import 'package:gemexplora/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
@@ -117,6 +119,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    logger.i('TOKEN in HomeScreen: ${authProvider.token}');
+    logger.i('USER in HomeScreen: ${authProvider.user?.toJson()}');
   }
 
   @override

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:gemexplora/login_signup.dart';
 import 'package:gemexplora/splash_screen.dart';
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:gemexplora/provider_setup.dart';
+import 'package:gemexplora/widgets/auth_gate.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp(
+    AppProviders( // ✅ wrap here
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,11 +21,11 @@ class MyApp extends StatelessWidget {
       title: 'GemExplora',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
       home: SplashScreen(
-        nextScreen: const AuthPage(),
+        nextScreen: const AuthGate(),
         duration: const Duration(seconds: 3),
       ),
     );

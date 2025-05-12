@@ -80,7 +80,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
     
     _controller.forward().then((_) {
-      Future.delayed(widget.duration - const Duration(milliseconds: 2500), () {
+      Future.delayed(
+        widget.duration - const Duration(milliseconds: 2500), 
+      ).then((_) {
+        if(!mounted) return;
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => widget.nextScreen,
@@ -243,7 +246,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       shadows: [
                         Shadow(
                           blurRadius: 2.0,
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withAlpha((0.1*255).toInt()),
                           offset: const Offset(1.0, 1.0),
                         ),
                       ],
@@ -283,14 +286,14 @@ class Diamond extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              color.withOpacity(0.9),
+              color.withAlpha((0.9*255).toInt()),
               color,
-              color.withOpacity(0.8),
+              color.withAlpha((0.8*255).toInt()),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
+              color: color.withAlpha((0.3*255).toInt()),
               blurRadius: 8,
               spreadRadius: 1,
               offset: const Offset(0, 3),

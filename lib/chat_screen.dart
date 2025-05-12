@@ -48,7 +48,7 @@ class GemExploraApp extends StatelessWidget {
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF115E59).withOpacity(0.5),
+          fillColor: const Color(0xFF115E59).withAlpha((0.5*255).toInt()),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(color: Color(0xFF0F766E)),
@@ -62,7 +62,7 @@ class GemExploraApp extends StatelessWidget {
             borderSide: const BorderSide(color: Color(0xFF14B8A6), width: 2),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          hintStyle: TextStyle(color: const Color(0xFF5EEAD4).withOpacity(0.7)),
+          hintStyle: TextStyle(color: const Color(0xFF5EEAD4).withAlpha((0.7*255).toInt())),
         ),
         tabBarTheme: TabBarTheme(
           labelColor: const Color(0xFF042F2E),
@@ -150,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   SliverAppBar(
                     pinned: true,
                     floating: false,
-                    backgroundColor: const Color(0xFF042F2E).withOpacity(0.8),
+                    backgroundColor: const Color(0xFF042F2E).withAlpha((0.8*255).toInt()),
                     systemOverlayStyle: SystemUiOverlayStyle.light,
                     title: Row(
                       children: [
@@ -353,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildTabBar() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF115E59).withOpacity(0.3),
+        color: const Color(0xFF115E59).withAlpha((0.3*255).toInt()),
         border: Border.all(color: const Color(0xFF115E59)),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -773,15 +773,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFF115E59).withOpacity(0.7),
-            const Color(0xFF065F46).withOpacity(0.7),
+            const Color(0xFF115E59).withAlpha((0.7*255).toInt()),
+            const Color(0xFF065F46).withAlpha((0.7*255).toInt()),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFF0F766E)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF14B8A6).withOpacity(0.1),
+            color: const Color(0xFF14B8A6).withAlpha((0.1*255).toInt()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -890,7 +890,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF115E59).withOpacity(0.5),
+                          color: const Color(0xFF115E59).withAlpha((0.5*255).toInt()),
                           border: Border.all(color: const Color(0xFF0F766E)),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -939,7 +939,7 @@ class AiAssistantButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF042F2E).withOpacity(0.3),
+              color: const Color(0xFF042F2E).withAlpha((0.3*255).toInt()),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1091,7 +1091,7 @@ class _AiAssistantSheetState extends State<AiAssistantSheet> {
             decoration: BoxDecoration(
               color: message.isUser
                   ? const Color(0xFFF59E0B)
-                  : const Color(0xFF115E59).withOpacity(0.5),
+                  : const Color(0xFF115E59).withAlpha((0.5*255).toInt()),
               borderRadius: BorderRadius.circular(16),
               border: message.isUser
                   ? null
@@ -1125,7 +1125,7 @@ class _AiAssistantSheetState extends State<AiAssistantSheet> {
               controller: _messageController,
               decoration: InputDecoration(
                 hintText: 'Ask about destinations, food, or activities...',
-                hintStyle: TextStyle(color: const Color(0xFF5EEAD4).withOpacity(0.7)),
+                hintStyle: TextStyle(color: const Color(0xFF5EEAD4).withAlpha((0.7*255).toInt())),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: const BorderSide(color: Color(0xFF0F766E)),

@@ -99,7 +99,7 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF006D7E),
+      backgroundColor: const Color.fromARGB(255, 86, 89, 255),
       body: SafeArea(
         child: Stack(
           children: [
@@ -111,7 +111,7 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
                 width: 120,
                 height: 120,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF67B1A2),
+                  color: Color.fromARGB(255, 139, 168, 255),
                   borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(120),
                   ),
@@ -398,7 +398,7 @@ class LoginFormState extends State<LoginForm> {
                 child: const Text('Login',
                   style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -515,7 +515,6 @@ class SignUpFormState extends State<SignUpForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _phoneController = TextEditingController();
   
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -526,7 +525,6 @@ class SignUpFormState extends State<SignUpForm> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _phoneController.dispose();
     super.dispose();
   }
 
@@ -541,7 +539,7 @@ class SignUpFormState extends State<SignUpForm> {
         body: jsonEncode({
           'email': _emailController.text,
           'password': _passwordController.text,
-          'phone': _phoneController.text,
+          
         }),
       );
       
@@ -679,22 +677,7 @@ class SignUpFormState extends State<SignUpForm> {
                   },
                 ),
               ),
-              
-              const SizedBox(height: 16),
-              
-              // Phone Input
-              buildInputField(
-                controller: _phoneController,
-                hintText: 'Phone',
-                prefixIcon: Icons.phone_android_outlined,
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-                  return null;
-                },
-              ),
+                          
               
               const SizedBox(height: 40),
               
@@ -715,7 +698,7 @@ class SignUpFormState extends State<SignUpForm> {
                     'Sign Up',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gemexplora/login_signup.dart';
 import 'package:gemexplora/splash_screen.dart';
 // import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +21,7 @@ class MyApp extends StatelessWidget {
       title: 'GemExplora',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

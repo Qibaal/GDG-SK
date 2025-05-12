@@ -5,11 +5,8 @@ import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-
-
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
-
   @override
   AuthPageState createState() => AuthPageState();
 }
@@ -21,6 +18,7 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
   late Animation<Offset> signUpSlideAnimation;
   late Animation<double> loginOpacityAnimation;
   late Animation<double> signUpOpacityAnimation;
+  late Animation<double> containerPositionAnimation;
   bool _showTitle = false;
   bool _showSubtitle = false;
 
@@ -76,6 +74,13 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
       parent: animationController,
       curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
     ));
+    containerPositionAnimation = Tween<double>(
+      begin: 0.25,  // Initial position (25% from top)
+      end: 0.15,    // End position (5% from top) - this will cover the header text
+    ).animate(CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -99,7 +104,7 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 86, 89, 255),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: SafeArea(
         child: Stack(
           children: [
@@ -111,7 +116,7 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
                 width: 120,
                 height: 120,
                 decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 139, 168, 255),
+                  color: Color(0xFFF5F5F5),
                   borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(120),
                   ),
@@ -121,7 +126,7 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
 
             // Header Text
             Positioned(
-              top: 120,
+              top: 200,
               left: 20,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,12 +134,12 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
                   AnimatedOpacity(
                     opacity: _showTitle ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 500),
-                    child: const Text(
+                    child: Text(
                       'Hello!',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Color(0xFF0077B6),
                       ),
                     ),
                   ),
@@ -142,11 +147,12 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
                   AnimatedOpacity(
                     opacity: _showSubtitle ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 500),
-                    child: const Text(
+                    child: Text(
                       'Welcome to Gem Explora',
                       style: TextStyle(
                         fontSize: 18,
-                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF0077B6),
                       ),
                     ),
                   ),
@@ -155,19 +161,35 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
             ),
 
             // Form Container
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.25,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
+            // Positioned(
+            //   top: MediaQuery.of(context).size.height * 0.25,
+            //   left: 0,
+            //   right: 0,
+            //   bottom: 0,
+            //   child: Container(
+            //     decoration: const BoxDecoration(
+            //       color: Color(0xFFF5F5F5),
+            //       borderRadius: BorderRadius.only(
+            //         topLeft: Radius.circular(30),
+            //         topRight: Radius.circular(30),
+            //       ),
+            //     ),
+            AnimatedBuilder(
+              animation: containerPositionAnimation,
+              builder: (context, child) {
+                return Positioned(
+                  top: MediaQuery.of(context).size.height * (containerPositionAnimation.value+0.15),
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
                 child: Stack(
                   children: [
                     // Login Form
@@ -192,6 +214,8 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
                   ],
                 ),
               ),
+            );
+              },
             ),
           ],
         ),
@@ -330,12 +354,12 @@ class LoginFormState extends State<LoginForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Login',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF006D7E),
+                color: Color.fromARGB(255, 0, 0, 0),
               ),
             ),
             
@@ -373,9 +397,11 @@ class LoginFormState extends State<LoginForm> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {},
-                child: const Text(
+                child: Text(
                   'Forgot Password',
-                  style: TextStyle(color: Color(0xFF006D7E)),
+                  style: TextStyle(
+                    color: Color(0xFF858C95),
+                    fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -389,13 +415,13 @@ class LoginFormState extends State<LoginForm> {
               child: ElevatedButton(
                 onPressed: _handleLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF006D7E),
+                  backgroundColor: const Color(0xFF0077B6),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('Login',
+                child: Text('Login',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -404,7 +430,7 @@ class LoginFormState extends State<LoginForm> {
               ),
             ),
             
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
             
             Row(
               children: [
@@ -414,7 +440,7 @@ class LoginFormState extends State<LoginForm> {
                   child: Text(
                     'Or login with',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: Color(0xFF858C95),
                       fontSize: 14,
                     ),
                   ),
@@ -423,7 +449,7 @@ class LoginFormState extends State<LoginForm> {
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -463,32 +489,24 @@ class LoginFormState extends State<LoginForm> {
                 ),
               ],
             ),
-
-          
-          const SizedBox(height: 24),
-          
-          // Social login buttons - styled like in Image 2
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     buildSocialLoginButton('assets/google.png', Colors.red),
-          //     const SizedBox(width: 16),
-          //     buildSocialLoginButton('assets/apple.png', Colors.black),
-          //   ],
-          // ),
           
           const SizedBox(height: 24),
             // Sign Up Option
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Don\'t have an account? '),
+                const Text(
+                  'Don\'t have an account? ',
+                  style:TextStyle(
+                    color: Color(0xFF858c95),
+                  )
+                ),
                 GestureDetector(
                   onTap: widget.onSignUpPressed,
-                  child: const Text(
+                  child: Text(
                     'Sign Up',
                     style: TextStyle(
-                      color: Color(0xFF006D7E),
+                      color: Color(0xFF00B4D8),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -579,11 +597,13 @@ class SignUpFormState extends State<SignUpForm> {
               GestureDetector(
                 onTap: widget.onLoginPressed,
                 child: Row(
-                  children: const [
+                  children:  [
                     Icon(Icons.arrow_back_ios, color: Color(0xFF006D7E)),
                     Text(
                       'Back to Login',
-                      style: TextStyle(color: Color(0xFF006D7E)),
+                      style: TextStyle(
+                        color: Color(0xFF023E8A),
+                        fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -591,12 +611,12 @@ class SignUpFormState extends State<SignUpForm> {
               
               const SizedBox(height: 20),
               
-              const Text(
+              Text(
                 'Sign Up',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF006D7E),
+                  color: Color.fromARGB(255, 0, 0, 0),
                 ),
               ),
               
@@ -688,13 +708,13 @@ class SignUpFormState extends State<SignUpForm> {
                 child: ElevatedButton(
                   onPressed: _registerUser,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF006D7E),
+                    backgroundColor: const Color(0xFF0077B6),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Sign Up',
                     style: TextStyle(
                       fontSize: 16,
@@ -726,7 +746,7 @@ Widget buildInputField({
     obscureText: obscureText,
     keyboardType: keyboardType,
     validator: validator,
-    style: const TextStyle(
+    style: TextStyle(
       fontSize: 16,
       color: Colors.black87,
     ),

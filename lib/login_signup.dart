@@ -1,10 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gemexplora/chat_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -263,46 +268,264 @@ class LoginFormState extends State<LoginForm> {
   //   }
   // }
 
+  late final GoogleSignIn _googleSignIn;
 
-  Future<void> _handleGoogleSignIn() async {
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn(
-        clientId: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
-      ).signIn();
-      if (googleUser == null) return; // user canceled
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final idToken = googleAuth.idToken;
-      final accessToken = googleAuth.accessToken;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('google_id_token', idToken ?? '');
-      await prefs.setString('google_access_token', accessToken ?? '');
-      await prefs.setString('google_user_email', googleUser.email);
-      await prefs.setString('google_display_name', googleUser.displayName ?? '');
-      print('Google ID Token: $idToken');
-      print('Access Token: $accessToken');
-
-      // Jika pakai Firebase:
-      // final credential = GoogleAuthProvider.credential(
-      //   idToken: googleAuth.idToken,
-      //   accessToken: googleAuth.accessToken,
-      // );
-      // await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // Simpan ke SharedPreferences
+  @override
+  void initState() {
+    super.initState();
     
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+    // Initialize Google Sign-In with platform-specific settings
+    if (kIsWeb) {
+      // Web requires clientId
+      _googleSignIn = GoogleSignIn(
+        clientId: '112571618899-53i2orp47rs7m50rr160g27aeu5tjg7b.apps.googleusercontent.com', // Replace with your web client ID
+        scopes: ['email', 'profile'],
       );
-    } catch (e) {
-      print('Google Sign-In error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google Sign-In failed: $e')),
+    } else {
+      // Mobile platforms (Android/iOS) get client ID from Google services config files
+      _googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
       );
     }
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      print('Starting Google Sign-In process');
+      
+      // Check if already signed in - might help diagnose issues
+      final bool isSignedIn = await _googleSignIn.isSignedIn();
+      print('Already signed in: $isSignedIn');
+      
+      if (isSignedIn) {
+        // Try to sign out first to prevent cached credentials issues
+        await _googleSignIn.signOut();
+        print('Signed out existing session');
+      }
+
+      // Show loading indicator for Google Sign-In
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        );
+      }
+      
+      print('Displaying sign-in dialog');
+      
+      // Attempt sign in
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      
+      // Close loading indicator immediately after sign-in dialog closes
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+      
+      if (googleUser == null) {
+        // User canceled the sign-in flow
+        print('Google Sign-In canceled by user');
+        return;
+      }
+
+      print('User selected account: ${googleUser.email}');
+      
+      // Show a new loading indicator for authentication process
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Completing authentication...', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            );
+          },
+        );
+      }
+
+      // Get authentication details
+      print('Getting authentication tokens');
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+      final String? accessToken = googleAuth.accessToken;
+      
+      if (idToken != null && idToken.isNotEmpty) {
+        print('ID Token received: ${idToken.substring(0, min(10, idToken.length))}...');
+      } else {
+        print('Warning: idToken is null or empty');
+      }
+      
+      if (accessToken != null && accessToken.isNotEmpty) {
+        print('Access Token received: ${accessToken.substring(0, min(10, accessToken.length))}...');
+      } else {
+        print('Warning: accessToken is null or empty');
+      }
+      
+      // FOR TESTING ONLY: Skip backend verification during development
+      // Remove this section when your backend is ready
+      print('DEVELOPMENT MODE: Skipping backend verification');
+      
+      // Close loading indicator
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+      
+      // Navigate to home screen directly (TEMPORARY for testing)
+      // if (mounted) {
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(builder: (_) => const HomeScreen()),
+      //   );
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(content: Text('Google Sign-In Successful (Dev Mode)')),
+      //   );
+      // }
+      
+      // Comment out the backend verification for now
+      // Verify with your backend server
+      try {
+        print('Attempting backend verification with URL: http://10.0.2.2:8080/auth/google');
+        
+        final bool backendVerified = await _verifyWithBackend(
+          idToken: idToken,
+          accessToken: accessToken,
+          email: googleUser.email,
+        );
+        
+        // Close loading indicator after verification
+        if (mounted && Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+        
+        print('Backend verification result: $backendVerified');
+        
+        if (backendVerified) {
+          // Navigate to home screen on success
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Login Successful')),
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Server authentication failed')),
+            );
+          }
+        }
+      } catch (backendError) {
+        // Close loading indicator if error occurs
+        if (mounted && Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
+        
+        print('Backend verification error: $backendError');
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Server error: ${backendError.toString()}')),
+          );
+        }
+      }
+    } catch (e) {
+      // Close loading indicator if still showing
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+      
+      print('Google Sign-In error: $e');
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google Sign-In failed: ${e.toString()}')),
+        );
+      }
+    }
+  }
+
+  // Updated _verifyWithBackend method with proper emulator URL
+  Future<bool> _verifyWithBackend({
+    required String? idToken,
+    required String? accessToken,
+    required String email,
+  }) async {
+    try {
+      // Use 10.0.2.2 for Android emulator to access host machine's localhost
+      // Use localhost for iOS simulator
+      final String backendUrl = Platform.isAndroid 
+        ? 'http://localhost:8080/auth/google'  // Android emulator → host localhost
+        : 'http://localhost:8080/auth/google'; // iOS simulator
+      
+      print('Sending verification request to backend: $backendUrl');
+      
+      final response = await http.post(
+        Uri.parse(backendUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'idToken': idToken,
+          'accessToken': accessToken,
+          'email': email,
+        }),
+      ).timeout(const Duration(seconds: 10)); // Add timeout to avoid hanging
+      
+      print('Backend response status: ${response.statusCode}');
+      print('Backend response body: ${response.body}');
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // Parse and store any tokens/user data your server returns
+        final responseData = jsonDecode(response.body);
+        print('Successfully parsed response data');
+        
+        // Store the JWT or session token your server provides
+        final secureStorage = FlutterSecureStorage();
+        await secureStorage.write(
+          key: 'auth_token', 
+          value: responseData['token'] ?? '',
+        );
+        print('Token stored securely');
+        
+        return true;
+      } else {
+        print('Backend verification failed: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Backend verification error details: $e');
+      // More specific error handling
+      if (e is SocketException) {
+        print('Socket error - likely server connection issue or wrong address');
+      } else if (e is TimeoutException) {
+        print('Request timed out - server might be unreachable');
+      } else if (e is FormatException) {
+        print('Format error - could not parse server response');
+      }
+      return false;
+    }
+  }
+
+  Future<bool> _isSignedInWithGoogle() async {
+    try {
+      return await _googleSignIn.isSignedIn();
+    } catch (e) {
+      print('Error checking Google sign-in status: $e');
+      return false;
+    }
+  }
 
   Future<void> _handleLogin() async {
     // Login logic remains the same as in your original implementation

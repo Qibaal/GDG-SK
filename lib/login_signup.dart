@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -231,37 +231,37 @@ class LoginFormState extends State<LoginForm> {
     super.dispose();
   }
 
-  Future<void> _handleAppleSignIn() async {
-    try {
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+  // Future<void> _handleAppleSignIn() async {
+  //   try {
+  //     final credential = await SignInWithApple.getAppleIDCredential(
+  //       scopes: [
+  //         AppleIDAuthorizationScopes.email,
+  //         AppleIDAuthorizationScopes.fullName,
+  //       ],
+  //     );
 
-      print('Apple ID: ${credential.userIdentifier}');
-      print('Email: ${credential.email}');
+  //     print('Apple ID: ${credential.userIdentifier}');
+  //     print('Email: ${credential.email}');
 
-      // Jika pakai Firebase:
-      // final oAuthProvider = OAuthProvider("apple.com");
-      // final firebaseCredential = oAuthProvider.credential(
-      //   idToken: credential.identityToken,
-      //   accessToken: credential.authorizationCode,
-      // );
-      // await FirebaseAuth.instance.signInWithCredential(firebaseCredential);
+  //     // Jika pakai Firebase:
+  //     // final oAuthProvider = OAuthProvider("apple.com");
+  //     // final firebaseCredential = oAuthProvider.credential(
+  //     //   idToken: credential.identityToken,
+  //     //   accessToken: credential.authorizationCode,
+  //     // );
+  //     // await FirebaseAuth.instance.signInWithCredential(firebaseCredential);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } catch (e) {
-      print('Apple Sign-In error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Apple Sign-In failed: $e')),
-      );
-    }
-  }
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (_) => const HomeScreen()),
+  //     );
+  //   } catch (e) {
+  //     print('Apple Sign-In error: $e');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Apple Sign-In failed: $e')),
+  //     );
+  //   }
+  // }
 
 
   Future<void> _handleGoogleSignIn() async {
@@ -465,22 +465,22 @@ class LoginFormState extends State<LoginForm> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: _handleAppleSignIn, // pastikan ini juga ada
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Image.asset(
-                    'assets/apple.png',
-                    height: 24,
-                    width: 24,
-                  ),
-                ),
+                // ElevatedButton(
+                //   onPressed: _handleAppleSignIn, // pastikan ini juga ada
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.white,
+                //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //     elevation: 0,
+                //   ),
+                //   child: Image.asset(
+                //     'assets/apple.png',
+                //     height: 24,
+                //     width: 24,
+                //   ),
+                // ),
               ],
             ),
           

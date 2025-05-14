@@ -273,7 +273,12 @@ class LoginFormState extends State<LoginForm> {
                 if (success) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => ChangeNotifierProvider<AuthProvider>.value(
+                        value: Provider.of<AuthProvider>(context, listen: false),
+                        child: const HomeScreen(),
+                      ),
+                    ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -393,55 +398,6 @@ class SignUpFormState extends State<SignUpForm> {
     super.dispose();
   }
 
-  // Future<void> _registerUser() async {
-  //   final url = Uri.parse('http://localhost:8080/register');
-  //   final response = await http.post(
-  //     url,
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: jsonEncode({
-  //       'name': _nameController.text,
-  //       'email': _emailController.text,
-  //       'password': _passwordController.text,
-  //     }),
-  //   );
-
-  //   if (response.statusCode >= 200 && response.statusCode < 300) {
-  //     // Auto-login after successful registration
-  //     final loginUrl = Uri.parse('http://localhost:8080/login');
-  //     final loginResponse = await http.post(
-  //       loginUrl,
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: jsonEncode({
-  //         'email': _emailController.text,
-  //         'password': _passwordController.text,
-  //       }),
-  //     );
-
-  //     final data = jsonDecode(loginResponse.body);
-
-  //     if (loginResponse.statusCode >= 200 && data['token'] != null) {
-  //       final prefs = await SharedPreferences.getInstance();
-  //       await prefs.setString('token', data['token']);
-  //       await prefs.setString('user', jsonEncode(data['user']));
-  //       print('Stored sign in token = ${prefs.getString('token')}');
-
-  //       Navigator.pushReplacement(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => const HomeScreen()),
-  //       );
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Login after registration failed: ${data['message'] ?? 'Unknown error'}')),
-  //       );
-  //     }
-  //   } else {
-  //     final data = jsonDecode(response.body);
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Registration failed: ${data['message'] ?? 'Unknown error'}')),
-  //     );
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -546,7 +502,12 @@ class SignUpFormState extends State<SignUpForm> {
                     if (success) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => ChangeNotifierProvider<AuthProvider>.value(
+                            value: Provider.of<AuthProvider>(context, listen: false),
+                            child: const HomeScreen(),
+                          ),
+                        ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(

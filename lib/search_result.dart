@@ -1,47 +1,57 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:gemexplora/providers/auth_provider.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+// void main() {
+//   runApp(const MyApp());
+// }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
+//   @override
+//   Widget build(BuildContext context) {
+//     SystemChrome.setSystemUIOverlayStyle(
+//       const SystemUiOverlayStyle(
+//         statusBarColor: Colors.transparent,
+//         statusBarIconBrightness: Brightness.dark,
+//       ),
+//     );
     
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Travel Search Results',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Poppins',
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
-          titleTextStyle: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      home: const SearchResultPage(),
-    );
-  }
-}
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       title: 'Travel Search Results',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         fontFamily: 'Poppins',
+//         scaffoldBackgroundColor: Colors.black,
+//         appBarTheme: const AppBarTheme(
+//           backgroundColor: Colors.black,
+//           elevation: 0,
+//           iconTheme: IconThemeData(color: Colors.black),
+//           titleTextStyle: TextStyle(
+//             color: Colors.black,
+//             fontSize: 18,
+//             fontWeight: FontWeight.w600,
+//           ),
+//         ),
+//       ),
+//       home: const SearchResultPage(),
+//     );
+//   }
+// }
 
 class SearchResultPage extends StatefulWidget {
-  const SearchResultPage({super.key});
+  final String travelQuery;
+  final Map<String, dynamic> resultData;
+
+  const SearchResultPage({
+    super.key,
+    required this.travelQuery,
+    required this.resultData,
+  });
 
   @override
   State<SearchResultPage> createState() => _SearchResultPageState();
@@ -49,11 +59,28 @@ class SearchResultPage extends StatefulWidget {
 
 class _SearchResultPageState extends State<SearchResultPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  Map<String, dynamic>? _geminiResult;
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+
+    Future.microtask(() async {
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final token = auth.token;
+
+      if (token != null) {
+        await loadGeminiResponse(widget.travelQuery, token);
+      } else {
+        setState(() {
+          _error = "No token found";
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   @override
@@ -73,7 +100,6 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildRecentSearchesCarousel(),
                   const SizedBox(height: 24),
                   _buildAnswerBox(),
                   _buildDestinationDetails(),
@@ -86,14 +112,37 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Show search dialog or navigate to search page
-        },
-        backgroundColor: const Color(0xFF1A73E8),
-        child: const Icon(Icons.search),
-      ),
     );
+  }
+
+  Future<void> loadGeminiResponse(String query, String token) async {
+    final url = Uri.parse('http://localhost:8080/query-response?query=$query');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _geminiResult = data;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'Failed to fetch Gemini response';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = 'Error: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   Widget _buildAppBar() {
@@ -115,88 +164,6 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
     );
   }
 
-  Widget _buildRecentSearchesCarousel() {
-    return Container(
-      height: 120,
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Recent Searches',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                List<String> destinations = [
-                  'Bali, Indonesia',
-                  'Raja Ampat, Papua',
-                  'Lombok, NTB',
-                  'Labuan Bajo, NTT',
-                  'Yogyakarta, Java',
-                ];
-                return Container(
-                  width: 150,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha((0.1*255).toInt()),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                        child: Image.network(
-                          'https://picsum.photos/150/70?random=$index',
-                          height: 70,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child:Center(
-                        child: Text(
-                          destinations[index],
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
   Widget _buildAnswerBox() {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -235,12 +202,9 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'I want to travel to West Papua for 3 days, with a budget of 50 million IDR',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black.withAlpha((0.8*255).toInt()),
-                        fontWeight: FontWeight.w500,
-                      ),
+                      _geminiResult?['firstResponse'] ??
+                          'Loading travel insights...',
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
@@ -517,9 +481,17 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
       children: [
         TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF1A73E8),
+          labelColor: Theme.of(context).colorScheme.primary,
           unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFF1A73E8),
+          indicator: UnderlineTabIndicator(
+            borderSide: BorderSide(
+              width: 2.5,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            insets: EdgeInsets.symmetric(horizontal: 16),
+          ),
+          indicatorSize: TabBarIndicatorSize.tab, 
+          labelStyle: const TextStyle(fontWeight: FontWeight.w600),
           tabs: const [
             Tab(text: 'Hotels'),
             Tab(text: 'Food'),

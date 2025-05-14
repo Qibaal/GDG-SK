@@ -3,6 +3,7 @@ import 'package:gemexplora/chat_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthPage extends StatefulWidget {
@@ -159,26 +160,11 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
                 ],
               ),
             ),
-
-            // Form Container
-            // Positioned(
-            //   top: MediaQuery.of(context).size.height * 0.25,
-            //   left: 0,
-            //   right: 0,
-            //   bottom: 0,
-            //   child: Container(
-            //     decoration: const BoxDecoration(
-            //       color: Color(0xFFF5F5F5),
-            //       borderRadius: BorderRadius.only(
-            //         topLeft: Radius.circular(30),
-            //         topRight: Radius.circular(30),
-            //       ),
-            //     ),
             AnimatedBuilder(
               animation: containerPositionAnimation,
               builder: (context, child) {
                 return Positioned(
-                  top: MediaQuery.of(context).size.height * (containerPositionAnimation.value+0.15),
+                  top: MediaQuery.of(context).size.height * (containerPositionAnimation.value+0.17),
                   left: 0,
                   right: 0,
                   bottom: 0,
@@ -280,13 +266,19 @@ class LoginFormState extends State<LoginForm> {
 
   Future<void> _handleGoogleSignIn() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn(
+        clientId: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
+      ).signIn();
       if (googleUser == null) return; // user canceled
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final idToken = googleAuth.idToken;
       final accessToken = googleAuth.accessToken;
-
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('google_id_token', idToken ?? '');
+      await prefs.setString('google_access_token', accessToken ?? '');
+      await prefs.setString('google_user_email', googleUser.email);
+      await prefs.setString('google_display_name', googleUser.displayName ?? '');
       print('Google ID Token: $idToken');
       print('Access Token: $accessToken');
 
@@ -297,6 +289,8 @@ class LoginFormState extends State<LoginForm> {
       // );
       // await FirebaseAuth.instance.signInWithCredential(credential);
 
+      // Simpan ke SharedPreferences
+    
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),

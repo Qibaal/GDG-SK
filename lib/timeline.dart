@@ -230,7 +230,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                 ),
                 boxShadow: isSelected 
                     ? [BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withAlpha((0.05*255).toInt()),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       )]
@@ -389,7 +389,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05*255).toInt()),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -406,7 +406,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _getActivityColor(activity.type).withOpacity(0.1),
+                    color: _getActivityColor(activity.type).withAlpha((0.1*255).toInt()),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

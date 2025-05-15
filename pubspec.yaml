@@ -34,17 +34,11 @@ dependencies:
   logger: ^2.0.2
   provider: ^6.1.1
   shared_preferences: ^2.2.2
-<<<<<<< HEAD
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^6.0.0
   google_fonts: ^6.1.0
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage : ^9.0.0
   device_info_plus: ^9.0.2
-=======
-  google_sign_in: ^6.1.4
-  sign_in_with_apple: ^5.0.0
-  google_fonts: ^6.1.0
->>>>>>> Nicho
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

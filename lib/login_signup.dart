@@ -11,6 +11,9 @@ class AuthPage extends StatefulWidget {
 
 class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
   bool _isLogin = true;
+  bool _showTitle = false;
+  bool _showSubtitle = false;
+  late Animation<double> _containerPositionAnimation;
   late AnimationController _animationController;
   late Animation<Offset> _loginSlideAnimation;
   late Animation<Offset> _signUpSlideAnimation;
@@ -58,6 +61,23 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
       parent: _animationController,
       curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
     ));
+
+    // trigger header fade-in
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() => _showTitle = true);
+    });
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      setState(() => _showSubtitle = true);
+    });
+
+    // panel slide up a bit to make room for header
+    _containerPositionAnimation = Tween<double>(
+      begin: 0.25,  // 25% from top
+      end:   0.15,  // 15% from top
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -79,94 +99,140 @@ class AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin 
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    body: Center(
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/shibuya.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SafeArea(
-          child: Center( // Tambahkan Center di sini
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // Pastikan posisi vertikal center
-                  children: [
-                    // Logo dan judul bisa tetap di sini
-                    
-                    const SizedBox(height: 30),
-                    
-                    // Form Container dengan design yang fleksibel
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
-                      width: double.infinity,
-                      height: _isLogin ? 500 : 600,
-                      decoration: BoxDecoration(
-                        color: Color(0xAA1A1E35),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Color(0x334A90E2),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha((0.1*255).toInt()),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        
-                          child: Stack(
-                            children: [
-                              // Login Form
-                              SlideTransition(
-                                position: _loginSlideAnimation,
-                                child: FadeTransition(
-                                  opacity: _loginOpacityAnimation,
-                                  child: LoginForm(
-                                    isVisible: _isLogin,
-                                    onSignUpPressed: _toggleForm,
-                                  ),
-                                ),
-                              ),
-                              
-                              // Sign Up Form
-                              SlideTransition(
-                                position: _signUpSlideAnimation,
-                                child: FadeTransition(
-                                  opacity: _signUpOpacityAnimation,
-                                  child: SignUpForm(
-                                    isVisible: !_isLogin,
-                                    onLoginPressed: _toggleForm,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 30),
-                    // Social Media Login atau konten lainnya
-                  ],
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // 2) Green curved header shape
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(120),
+                  ),
                 ),
               ),
             ),
-          ),
+
+            // 3) Animated “Hello!” + subtitle
+            Positioned(
+              top: 200,
+              // top: MediaQuery.of(context).size.height * 0.15,
+              left: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AnimatedOpacity(
+                    opacity: _showTitle ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 500),
+                    child: const Text(
+                      'Hello!',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0077B6),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  AnimatedOpacity(
+                    opacity: _showSubtitle ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 500),
+                    child: const Text(
+                      'Welcome to GemExplora',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF0077B6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // 4) Sliding panel (login/signup)
+            AnimatedBuilder(
+              animation: _containerPositionAnimation,
+              builder: (context, child) {
+                final topOffset = MediaQuery.of(context).size.height *
+                    _containerPositionAnimation.value;
+                return Positioned(
+                  top: topOffset,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    // decoration: BoxDecoration(
+                    //   color: const Color(0xAA1A1E35),
+                    //   borderRadius: const BorderRadius.only(
+                    //     topLeft: Radius.circular(20),
+                    //     topRight: Radius.circular(20),
+                    //   ),
+                    //   border: Border.all(
+                    //     color: const Color(0x334A90E2),
+                    //     width: 1.5,
+                    //   ),
+                    //   boxShadow: [
+                    //     BoxShadow(
+                    //       color: Colors.black.withAlpha((0.1 * 255).toInt()),
+                    //       blurRadius: 10,
+                    //       spreadRadius: 1,
+                    //     ),
+                    //   ],
+                    // ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                      child: Stack(
+                        children: [
+                          // Login form
+                          SlideTransition(
+                            position: _loginSlideAnimation,
+                            child: FadeTransition(
+                              opacity: _loginOpacityAnimation,
+                              child: LoginForm(
+                                isVisible: _isLogin,
+                                onSignUpPressed: _toggleForm,
+                              ),
+                            ),
+                          ),
+                          // Sign-up form
+                          SlideTransition(
+                            position: _signUpSlideAnimation,
+                            child: FadeTransition(
+                              opacity: _signUpOpacityAnimation,
+                              child: SignUpForm(
+                                isVisible: !_isLogin,
+                                onLoginPressed: _toggleForm,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
-    ),
-  );
+    );
   }
 }
 
@@ -214,20 +280,19 @@ class LoginFormState extends State<LoginForm> {
           const SizedBox(height: 30),
           
           // Email Input
-          buildTextFormField(
+          buildInputField(
             controller: _emailController,
-            labelText: 'Email',
-            icon: Icons.email,
-            keyboardType: TextInputType.emailAddress,
+            hintText: 'Email',
+            prefixIcon: Icons.email_outlined,
           ),
           
           const SizedBox(height: 16),
           
           // Password Input - Simplified design
-          buildTextFormField(
+          buildInputField(
             controller: _passwordController,
-            labelText: 'Password',
-            icon: Icons.lock,
+            hintText: 'Password',
+            prefixIcon: Icons.lock_outlined,
             obscureText: _obscurePassword,
             suffixIcon: IconButton(
               icon: Icon(
@@ -289,10 +354,8 @@ class LoginFormState extends State<LoginForm> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[700],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                backgroundColor: const Color(0xFF0077B6),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),
               child: const Text(
                 'LOGIN',
@@ -417,24 +480,24 @@ class SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 30),
 
-            buildTextFormField(
+            buildInputField(
               controller: _nameController,
-              labelText: 'Full Name',
-              icon: Icons.person,
+              hintText: 'Full Name',
+              prefixIcon: Icons.person_outlined,
               validator: (value) =>
                   value == null || value.isEmpty ? 'Please enter your name' : null,
             ),
 
             const SizedBox(height: 16),
 
-            buildTextFormField(
+            buildInputField(
               controller: _emailController,
-              labelText: 'Email',
-              icon: Icons.email,
-              keyboardType: TextInputType.emailAddress,
+              hintText: 'Email',
+              prefixIcon: Icons.email_outlined,
               validator: (value) {
                 if (value == null || value.isEmpty) return 'Please enter your email';
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                    .hasMatch(value)) {
                   return 'Please enter a valid email';
                 }
                 return null;
@@ -443,10 +506,10 @@ class SignUpFormState extends State<SignUpForm> {
 
             const SizedBox(height: 16),
 
-            buildTextFormField(
+            buildInputField(
               controller: _passwordController,
-              labelText: 'Password',
-              icon: Icons.lock,
+              hintText: 'Password',
+              prefixIcon: Icons.lock_outlined,
               obscureText: _obscurePassword,
               validator: (value) {
                 if (value == null || value.isEmpty) return 'Please enter a password';
@@ -464,10 +527,10 @@ class SignUpFormState extends State<SignUpForm> {
 
             const SizedBox(height: 16),
 
-            buildTextFormField(
+            buildInputField(
               controller: _confirmPasswordController,
-              labelText: 'Confirm Password',
-              icon: Icons.lock,
+              hintText: 'Confirm Password',
+              prefixIcon: Icons.lock_outlined,
               obscureText: _obscureConfirmPassword,
               validator: (value) {
                 if (value == null || value.isEmpty) return 'Please confirm your password';
@@ -479,10 +542,10 @@ class SignUpFormState extends State<SignUpForm> {
                   _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
                   color: Color(0xFFE0E6FF),
                 ),
-                onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                onPressed: () =>
+                    setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
               ),
             ),
-
             const SizedBox(height: 24),
 
             SizedBox(
@@ -517,10 +580,8 @@ class SignUpFormState extends State<SignUpForm> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[700],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  backgroundColor: const Color(0xFF0077B6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
                 child: const Text(
                   'SIGN UP',
@@ -578,51 +639,91 @@ class SignUpFormState extends State<SignUpForm> {
   }
 }
 
-Widget buildTextFormField({
-    required TextEditingController controller,
-    required String labelText,
-    required IconData icon,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-    Widget? suffixIcon,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      validator: validator,
-      style: const TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: TextStyle(color: Color(0xFFE0E6FF)),
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-        floatingLabelStyle: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.w500),
-        prefixIcon: Icon(icon, color: Color(0xFFE0E6FF)),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: Color(0x40202442),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue[700]!, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.red[400]!, width: 1.0),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue[700]!, width: 1.5),
-        ),
+// Widget buildTextFormField({
+//     required TextEditingController controller,
+//     required String labelText,
+//     required IconData icon,
+//     bool obscureText = false,
+//     TextInputType keyboardType = TextInputType.text,
+//     Widget? suffixIcon,
+//     String? Function(String?)? validator,
+//   }) {
+//     return TextFormField(
+//       controller: controller,
+//       obscureText: obscureText,
+//       keyboardType: keyboardType,
+//       validator: validator,
+//       style: const TextStyle(fontSize: 16),
+//       decoration: InputDecoration(
+//         labelText: labelText,
+//         labelStyle: TextStyle(color: Color(0xFFE0E6FF)),
+//         floatingLabelBehavior: FloatingLabelBehavior.auto,
+//         floatingLabelStyle: TextStyle(color: Colors.blue[700], fontWeight: FontWeight.w500),
+//         prefixIcon: Icon(icon, color: Color(0xFFE0E6FF)),
+//         suffixIcon: suffixIcon,
+//         filled: true,
+//         fillColor: Color(0x40202442),
+//         border: OutlineInputBorder(
+//           borderRadius: BorderRadius.circular(8),
+//           borderSide: BorderSide.none,
+//         ),
+//         focusedBorder: OutlineInputBorder(
+//           borderRadius: BorderRadius.circular(8),
+//           borderSide: BorderSide(color: Colors.blue[700]!, width: 1.5),
+//         ),
+//         errorBorder: OutlineInputBorder(
+//           borderRadius: BorderRadius.circular(8),
+//           borderSide: BorderSide(color: Colors.red[400]!, width: 1.0),
+//         ),
+//         focusedErrorBorder: OutlineInputBorder(
+//           borderRadius: BorderRadius.circular(8),
+//           borderSide: BorderSide(color: Colors.blue[700]!, width: 1.5),
+//         ),
         
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+//         contentPadding: const EdgeInsets.symmetric(vertical: 16),
+//       ),
+//     );
+// }
+Widget buildInputField({
+  required TextEditingController controller,
+  required String hintText,
+  required IconData prefixIcon,
+  bool obscureText = false,
+  Widget? suffixIcon,
+  String? Function(String?)? validator,
+}) {
+  return TextFormField(
+    controller: controller,
+    obscureText: obscureText,
+    validator: validator,
+    decoration: InputDecoration(
+      hintText: hintText,
+      prefixIcon: Icon(prefixIcon, color: Color(0xFF006D7E)),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: BorderSide.none,
       ),
-    );
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: const BorderSide(color: Color(0xFF006D7E), width: 1),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: const BorderSide(color: Colors.red, width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: const BorderSide(color: Colors.red, width: 1),
+      ),
+      suffixIcon: suffixIcon,
+    ),
+    style: const TextStyle(fontSize: 16, color: Colors.black87),
+  );
 }
+
 Widget buildSocialButton(String imagePath) {
   return ElevatedButton(
     onPressed: () {

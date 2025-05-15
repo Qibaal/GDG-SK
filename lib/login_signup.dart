@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -396,7 +397,6 @@ class LoginFormState extends State<LoginForm> {
       // Comment out the backend verification for now
       // Verify with your backend server
       try {
-        print('Attempting backend verification with URL: http://10.0.2.2:8080/auth/google');
         
         final bool backendVerified = await _verifyWithBackend(
           idToken: idToken,
@@ -438,8 +438,9 @@ class LoginFormState extends State<LoginForm> {
         print('Backend verification error: $backendError');
         
         if (mounted) {
+          final errorMessage = backendError.toString().replaceFirst('Exception: ', '');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Server error: ${backendError.toString()}')),
+            SnackBar(content: Text('Server error: $errorMessage')),
           );
         }
       }
@@ -468,14 +469,16 @@ class LoginFormState extends State<LoginForm> {
     try {
       // Use 10.0.2.2 for Android emulator to access host machine's localhost
       // Use localhost for iOS simulator
-      final String backendUrl = Platform.isAndroid 
-        ? 'http://localhost:8080/auth/google'  // Android emulator → host localhost
-        : 'http://localhost:8080/auth/google'; // iOS simulator
+      // const String backendBaseUrl = kIsWeb
+      // ? 'http://localhost:8081'
+      // : 'http://192.168.1.10:8081';
+      final backendBaseUrl = await getBackendBaseUrl();
+      final Uri backendUrl = Uri.parse('$backendBaseUrl/auth/google');
       
       print('Sending verification request to backend: $backendUrl');
       
       final response = await http.post(
-        Uri.parse(backendUrl),
+        backendUrl,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'idToken': idToken,
@@ -502,8 +505,9 @@ class LoginFormState extends State<LoginForm> {
         
         return true;
       } else {
-        print('Backend verification failed: ${response.body}');
-        return false;
+          final responseData = jsonDecode(response.body);
+          final errorMessage = responseData['error'] ?? 'Unknown error from server';
+          throw Exception(errorMessage); // lempar error ke catch block
       }
     } catch (e) {
       print('Backend verification error details: $e');
@@ -519,20 +523,35 @@ class LoginFormState extends State<LoginForm> {
     }
   }
 
-  Future<bool> _isSignedInWithGoogle() async {
-    try {
-      return await _googleSignIn.isSignedIn();
-    } catch (e) {
-      print('Error checking Google sign-in status: $e');
-      return false;
+  Future<String> getBackendBaseUrl() async {
+    if (kIsWeb) {
+      return 'http://localhost:8081';
     }
+
+    if (Platform.isAndroid) {
+      final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
+
+      if (!androidInfo.isPhysicalDevice) {
+        return 'http://localhost:8081'; // emulator
+      } else {
+        return 'http://192.168.1.10:8081'; // IP lokal dari laptop (seusuain ama ip laptop masing20)
+      }
+    }
+
+    // Platform lain (iOS, Windows, macOS, Linux)
+    return 'http://localhost:8081';
   }
 
   Future<void> _handleLogin() async {
     // Login logic remains the same as in your original implementation
     final String email = _emailController.text.trim();
     final String password = _passwordController.text;
-    final Uri url = Uri.parse('http://localhost:8080/login');
+    // const String backendBaseUrl = kIsWeb
+    // ? 'http://localhost:8081'
+    // : 'http://192.168.1.10:8081';
+    final backendBaseUrl = await getBackendBaseUrl();
+    final Uri url = Uri.parse('$backendBaseUrl/login');
 
     try {
       final http.Response response = await http.post(
@@ -767,10 +786,14 @@ class SignUpFormState extends State<SignUpForm> {
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
     
-    final url = Uri.parse('http://localhost:8080/register');
+    // const String backendBaseUrl = kIsWeb
+    //   ? 'http://localhost:8081'
+    //   : 'http://192.168.1.10:8081';
+    final backendBaseUrl = await getBackendBaseUrl();
+    final Uri backendUrl = Uri.parse('$backendBaseUrl/register');
     try {
       final response = await http.post(
-        url,
+        backendUrl,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _emailController.text,
@@ -802,6 +825,26 @@ class SignUpFormState extends State<SignUpForm> {
     }
   }
 
+    Future<String> getBackendBaseUrl() async {
+    if (kIsWeb) {
+      return 'http://localhost:8081';
+    }
+
+    if (Platform.isAndroid) {
+      final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
+
+      if (!androidInfo.isPhysicalDevice) {
+        return 'http://localhost:8081'; // emulator
+      } else {
+        return 'http://192.168.1.10:8081'; // IP lokal dari laptop (seusuain ama ip laptop masing20)
+      }
+    }
+
+    // Platform lain (iOS, Windows, macOS, Linux)
+    return 'http://localhost:8081';
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Padding(

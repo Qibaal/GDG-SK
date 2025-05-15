@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "112571618899",
+    "project_id": "gemexplora-hackathon",
+    "storage_bucket": "gemexplora-hackathon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112571618899:android:eb5dcfa7aaa6195d6558a6",
+        "android_client_info": {
+          "package_name": "com.example.gemexplora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "112571618899-53i2orp47rs7m50rr160g27aeu5tjg7b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAU7GN4zEczviBKzdif9axWXv9kQXIBlMA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112571618899-53i2orp47rs7m50rr160g27aeu5tjg7b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -48,6 +48,16 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
       "days": [
         {
           "date": "2025-03-30",
+          "budget": {
+            "amount": 1250000,
+            "currency": "IDR",
+            "categories": {
+              "accommodation": 550000,
+              "food": 350000,
+              "transportation": 200000,
+              "activities": 150000
+            }
+          },
           "activities": [
             {
               "type": "FLIGHT",
@@ -94,6 +104,16 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
         },
         {
           "date": "2025-03-31",
+          "budget": {
+            "amount": 950000,
+            "currency": "IDR",
+            "categories": {
+              "accommodation": 550000,
+              "food": 250000,
+              "transportation": 100000,
+              "activities": 50000
+            }
+          },
           "activities": [
             {
               "type": "BREAKFAST",
@@ -123,6 +143,16 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
         },
         {
           "date": "2025-04-01",
+          "budget": {
+            "amount": 1350000,
+            "currency": "IDR",
+            "categories": {
+              "accommodation": 550000,
+              "food": 300000,
+              "transportation": 250000,
+              "activities": 250000
+            }
+          },
           "activities": [
             {
               "type": "ACTIVITY",
@@ -164,7 +194,14 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
         return Activity.fromJson(activityData);
       }).toList();
       
-      return TripDay(date: date, activities: activities);
+      // Parse budget data
+      final Budget budget = Budget.fromJson(dayData['budget']);
+      
+      return TripDay(
+        date: date, 
+        activities: activities,
+        budget: budget,
+      );
     }).toList();
     
     setState(() {});
@@ -185,7 +222,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
           '${_tripName}Trip Plan',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
@@ -193,6 +230,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
       body: Column(
         children: [
           _buildDaySelection(),
+          _buildBudgetSection(),
           Expanded(
             child: _buildTimeline(),
           ),
@@ -263,55 +301,166 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
     );
   }
 
-  Widget _buildTimeline() {
-  final selectedDay = _tripDays[_selectedDayIndex];
-  
-  return ListView.builder(
-    padding: const EdgeInsets.all(16),
-    itemCount: selectedDay.activities.length,
-    itemBuilder: (context, index) {
-      final activity = selectedDay.activities[index];
-      final isFirst = index == 0;
-      final isLast = index == selectedDay.activities.length - 1;
-      
-      return IntrinsicHeight(                                      // ①
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,         // ②
-          children: [
-            // ─── Timeline column ────────────────────────────────
-            SizedBox(
-              width: 30,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  // Top line
-                  if (!isFirst)
-                    SizedBox(
-                      width: 2,
-                      child: CustomPaint(
-                        painter: DashedLinePainter(
-                          color: Color(0xFFE67E22),
-                          dashLength: 3,
-                          dashGap: 3,
-                        ),
-                      ),
-                    ),
-                  
-                  // Dot
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFE67E22),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
+  Widget _buildBudgetSection() {
+    final selectedDay = _tripDays[_selectedDayIndex];
+    final budget = selectedDay.budget;
+    
+    // Format currency
+    final formatter = NumberFormat('#,###', 'id_ID');
+    final formattedTotal = formatter.format(budget.amount);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Daily Budget / Person',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '${budget.currency} ${formattedTotal}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFE67E22),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Accommodation',
+                  budget.categories['accommodation'] ?? 0,
+                  budget.currency,
+                  Icons.hotel,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Food',
+                  budget.categories['food'] ?? 0,
+                  budget.currency,
+                  Icons.restaurant,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Transport',
+                  budget.categories['transportation'] ?? 0,
+                  budget.currency,
+                  Icons.directions_car,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Activities',
+                  budget.categories['activities'] ?? 0,
+                  budget.currency,
+                  Icons.hiking,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBudgetCategoryCard(String title, int amount, String currency, IconData icon) {
+    // Format currency
+    final formatter = NumberFormat('#,###', 'id_ID');
+    final formattedAmount = formatter.format(amount);
+    
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Color(0xFFF8F8F8),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Color(0xFFE67E22).withAlpha((0.1*255).toInt()),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 16,
+              color: Color(0xFFE67E22),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
-                  
-                  // Bottom line grows to fill rest of the row
-                  if (!isLast)
-                    Expanded(                                       // ③
-                      child: SizedBox(
+                ),
+                Text(
+                  '${currency} ${formattedAmount}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeline() {
+    final selectedDay = _tripDays[_selectedDayIndex];
+    
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: selectedDay.activities.length,
+      itemBuilder: (context, index) {
+        final activity = selectedDay.activities[index];
+        final isFirst = index == 0;
+        final isLast = index == selectedDay.activities.length - 1;
+        
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ─── Timeline column ────────────────────────────────
+              SizedBox(
+                width: 30,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    // Top line
+                    if (!isFirst)
+                      SizedBox(
                         width: 2,
                         child: CustomPaint(
                           painter: DashedLinePainter(
@@ -321,27 +470,51 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                           ),
                         ),
                       ),
+                    
+                    // Dot
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE67E22),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
                     ),
-                ],
+                    
+                    // Bottom line grows to fill rest of the row
+                    if (!isLast)
+                      Expanded(
+                        child: SizedBox(
+                          width: 2,
+                          child: CustomPaint(
+                            painter: DashedLinePainter(
+                              color: Color(0xFFE67E22),
+                              dashLength: 3,
+                              dashGap: 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            
-            const SizedBox(width: 16),
-            
-            // ─── Activity card ────────────────────────────────────
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
-                child: _buildActivityCard(activity),
+              
+              const SizedBox(width: 16),
+              
+              // ─── Activity card ────────────────────────────────────
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
+                  child: _buildActivityCard(activity),
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
+            ],
+          ),
+        );
+      },
+    );
   }
-
 
   Color _getActivityColor(String type) {
     switch (type) {
@@ -514,8 +687,33 @@ class DashedLinePainter extends CustomPainter {
 class TripDay {
   final DateTime date;
   final List<Activity> activities;
+  final Budget budget;
   
-  TripDay({required this.date, required this.activities});
+  TripDay({
+    required this.date, 
+    required this.activities,
+    required this.budget,
+  });
+}
+
+class Budget {
+  final int amount;
+  final String currency;
+  final Map<String, int> categories;
+  
+  Budget({
+    required this.amount,
+    required this.currency,
+    required this.categories,
+  });
+  
+  factory Budget.fromJson(Map<String, dynamic> json) {
+    return Budget(
+      amount: json['amount'],
+      currency: json['currency'],
+      categories: Map<String, int>.from(json['categories']),
+    );
+  }
 }
 
 class Activity {

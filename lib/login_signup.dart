@@ -1,16 +1,18 @@
+<<<<<<< HEAD
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+=======
+>>>>>>> Nicho
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gemexplora/chat_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class AuthPage extends StatefulWidget {
@@ -270,95 +272,16 @@ class LoginFormState extends State<LoginForm> {
   //   }
   // }
 
-  late final GoogleSignIn _googleSignIn;
-
-  @override
-  void initState() {
-    super.initState();
-    
-    // Initialize Google Sign-In with platform-specific settings
-    if (kIsWeb) {
-      // Web requires clientId
-      _googleSignIn = GoogleSignIn(
-        clientId: '112571618899-53i2orp47rs7m50rr160g27aeu5tjg7b.apps.googleusercontent.com', // Replace with your web client ID
-        scopes: ['email', 'profile'],
-      );
-    } else {
-      // Mobile platforms (Android/iOS) get client ID from Google services config files
-      _googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile'],
-      );
-    }
-  }
 
   Future<void> _handleGoogleSignIn() async {
     try {
-      print('Starting Google Sign-In process');
-      
-      // Check if already signed in - might help diagnose issues
-      final bool isSignedIn = await _googleSignIn.isSignedIn();
-      print('Already signed in: $isSignedIn');
-      
-      if (isSignedIn) {
-        // Try to sign out first to prevent cached credentials issues
-        await _googleSignIn.signOut();
-        print('Signed out existing session');
-      }
+      final GoogleSignInAccount? googleUser = await GoogleSignIn(
+        clientId: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
+      ).signIn();
+      if (googleUser == null) return; // user canceled
 
-      // Show loading indicator for Google Sign-In
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        );
-      }
-      
-      print('Displaying sign-in dialog');
-      
-      // Attempt sign in
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
-      // Close loading indicator immediately after sign-in dialog closes
-      if (mounted && Navigator.canPop(context)) {
-        Navigator.of(context).pop();
-      }
-      
-      if (googleUser == null) {
-        // User canceled the sign-in flow
-        print('Google Sign-In canceled by user');
-        return;
-      }
-
-      print('User selected account: ${googleUser.email}');
-      
-      // Show a new loading indicator for authentication process
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Completing authentication...', style: TextStyle(color: Colors.white)),
-                ],
-              ),
-            );
-          },
-        );
-      }
-
-      // Get authentication details
-      print('Getting authentication tokens');
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+<<<<<<< HEAD
       final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
       
@@ -444,22 +367,40 @@ class LoginFormState extends State<LoginForm> {
           );
         }
       }
+=======
+      final idToken = googleAuth.idToken;
+      final accessToken = googleAuth.accessToken;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('google_id_token', idToken ?? '');
+      await prefs.setString('google_access_token', accessToken ?? '');
+      await prefs.setString('google_user_email', googleUser.email);
+      await prefs.setString('google_display_name', googleUser.displayName ?? '');
+      print('Google ID Token: $idToken');
+      print('Access Token: $accessToken');
+
+      // Jika pakai Firebase:
+      // final credential = GoogleAuthProvider.credential(
+      //   idToken: googleAuth.idToken,
+      //   accessToken: googleAuth.accessToken,
+      // );
+      // await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Simpan ke SharedPreferences
+    
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+>>>>>>> Nicho
     } catch (e) {
-      // Close loading indicator if still showing
-      if (mounted && Navigator.canPop(context)) {
-        Navigator.of(context).pop();
-      }
-      
       print('Google Sign-In error: $e');
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google Sign-In failed: ${e.toString()}')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-In failed: $e')),
+      );
     }
   }
 
+<<<<<<< HEAD
   // Updated _verifyWithBackend method with proper emulator URL
   Future<bool> _verifyWithBackend({
     required String? idToken,
@@ -542,6 +483,8 @@ class LoginFormState extends State<LoginForm> {
     // Platform lain (iOS, Windows, macOS, Linux)
     return 'http://localhost:8081';
   }
+=======
+>>>>>>> Nicho
 
   Future<void> _handleLogin() async {
     // Login logic remains the same as in your original implementation

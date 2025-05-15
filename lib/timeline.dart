@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
 }
 
 class TravelPlannerScreen extends StatefulWidget {
-  const TravelPlannerScreen({Key? key}) : super(key: key);
+  const TravelPlannerScreen({super.key});
 
   @override
   State<TravelPlannerScreen> createState() => _TravelPlannerScreenState();
@@ -32,7 +32,8 @@ class TravelPlannerScreen extends StatefulWidget {
 class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   int _selectedDayIndex = 0;
   late List<TripDay> _tripDays;
-  
+  String _tripName = '';
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +44,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   void _loadTripData() {
     // Mock data - this would come from your JSON backend
     final mockData = {
-      "tripName": "Canada trip plan",
+      "tripName": " Jakarta ",
       "days": [
         {
           "date": "2025-03-30",
@@ -156,6 +157,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   }
   
   void _parseTripData(Map<String, dynamic> data) {
+    _tripName = data['tripName'] as String;
     _tripDays = (data['days'] as List).map((dayData) {
       final date = DateTime.parse(dayData['date']);
       final activities = (dayData['activities'] as List).map((activityData) {
@@ -180,7 +182,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
           onPressed: () {},
         ),
         title: Text(
-          'Canada trip plan',
+          '${_tripName}Trip Plan',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w500,
@@ -228,7 +230,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                 ),
                 boxShadow: isSelected 
                     ? [BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withAlpha((0.05*255).toInt()),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       )]
@@ -262,29 +264,30 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   }
 
   Widget _buildTimeline() {
-    final selectedDay = _tripDays[_selectedDayIndex];
-    
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      itemCount: selectedDay.activities.length,
-      itemBuilder: (context, index) {
-        final activity = selectedDay.activities[index];
-        final isFirst = index == 0;
-        final isLast = index == selectedDay.activities.length - 1;
-        
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  final selectedDay = _tripDays[_selectedDayIndex];
+  
+  return ListView.builder(
+    padding: const EdgeInsets.all(16),
+    itemCount: selectedDay.activities.length,
+    itemBuilder: (context, index) {
+      final activity = selectedDay.activities[index];
+      final isFirst = index == 0;
+      final isLast = index == selectedDay.activities.length - 1;
+      
+      return IntrinsicHeight(                                      // ①
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,         // ②
           children: [
-            // Timeline column with connecting lines
+            // ─── Timeline column ────────────────────────────────
             SizedBox(
               width: 30,
               child: Column(
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  // Top connecting line (except for first item)
+                  // Top line
                   if (!isFirst)
-                    Container(
+                    SizedBox(
                       width: 2,
-                      height: 24,
                       child: CustomPaint(
                         painter: DashedLinePainter(
                           color: Color(0xFFE67E22),
@@ -293,7 +296,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                         ),
                       ),
                     ),
-                    
+                  
                   // Dot
                   Container(
                     width: 30,
@@ -305,16 +308,17 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                     ),
                   ),
                   
-                  // Bottom connecting line (except for last item)
+                  // Bottom line grows to fill rest of the row
                   if (!isLast)
-                    Container(
-                      width: 2,
-                      height: 80, // Adjust based on content
-                      child: CustomPaint(
-                        painter: DashedLinePainter(
-                          color: Color(0xFFE67E22),
-                          dashLength: 3,
-                          dashGap: 3,
+                    Expanded(                                       // ③
+                      child: SizedBox(
+                        width: 2,
+                        child: CustomPaint(
+                          painter: DashedLinePainter(
+                            color: Color(0xFFE67E22),
+                            dashLength: 3,
+                            dashGap: 3,
+                          ),
                         ),
                       ),
                     ),
@@ -324,7 +328,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
             
             const SizedBox(width: 16),
             
-            // Activity details
+            // ─── Activity card ────────────────────────────────────
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
@@ -332,10 +336,12 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
               ),
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
+
 
   Color _getActivityColor(String type) {
     switch (type) {
@@ -383,7 +389,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05*255).toInt()),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -400,7 +406,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _getActivityColor(activity.type).withOpacity(0.1),
+                    color: _getActivityColor(activity.type).withAlpha((0.1*255).toInt()),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

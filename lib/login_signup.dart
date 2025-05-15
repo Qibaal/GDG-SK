@@ -341,7 +341,7 @@ class LoginFormState extends State<LoginForm> {
                     MaterialPageRoute(
                       builder: (context) => ChangeNotifierProvider<AuthProvider>.value(
                         value: Provider.of<AuthProvider>(context, listen: false),
-                        child: const HomeScreen(),
+                        child: const ChatScreen(),
                       ),
                     ),
                   );
@@ -568,7 +568,7 @@ class SignUpFormState extends State<SignUpForm> {
                         MaterialPageRoute(
                           builder: (context) => ChangeNotifierProvider<AuthProvider>.value(
                             value: Provider.of<AuthProvider>(context, listen: false),
-                            child: const HomeScreen(),
+                            child: const ChatScreen(),
                           ),
                         ),
                       );

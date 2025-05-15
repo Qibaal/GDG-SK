@@ -18,7 +18,7 @@ class AuthGate extends StatelessWidget {
     }
 
     return authProvider.isAuthenticated
-        ? const HomeScreen()
+        ? const ChatScreen()
         : const AuthPage();
   }
 }

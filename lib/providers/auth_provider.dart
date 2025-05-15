@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -72,7 +73,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse('http://localhost:8080/login');
+      final url = Uri.parse('${dotenv.env['API_BASE_URL']}/login');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -123,7 +124,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final registerUrl = Uri.parse('http://localhost:8080/register');
+      final registerUrl = Uri.parse('${dotenv.env['API_BASE_URL']}/register');
       final registerResponse = await http.post(
         registerUrl,
         headers: {'Content-Type': 'application/json'},
@@ -169,7 +170,7 @@ class AuthProvider with ChangeNotifier {
     if (_token == null) return false;
 
     try {
-      final url = Uri.parse('http://localhost:8080/validate-token');
+      final url = Uri.parse('${dotenv.env['API_BASE_URL']}/validate-token');
       final response = await http.post(
         url,
         headers: {

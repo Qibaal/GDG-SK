@@ -94,7 +94,7 @@ class GemExploraApp extends StatelessWidget {
           bodyMedium: TextStyle(color: Color(0xFF48CAE4)),
         ),
       ),
-      home: const HomeScreen(),
+      home: const ChatScreen(),
     );
   }
 }
@@ -149,14 +149,14 @@ Future<void> saveToHistory(String query, String userId, String token) async {
 }
 
 // Home Screen Widget
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
 
@@ -167,8 +167,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     Future.microtask(() {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      logger.i('TOKEN in HomeScreen: ${authProvider.token}');
-      logger.i('USER in HomeScreen: ${authProvider.user?.toJson()}');
+      logger.i('TOKEN in ChatScreen: ${authProvider.token}');
+      logger.i('USER in ChatScreen: ${authProvider.user?.toJson()}');
     });
   }
 

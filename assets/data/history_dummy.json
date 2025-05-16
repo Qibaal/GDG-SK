@@ -1,0 +1,25 @@
+{
+  "history": [
+    {
+      "id": "h001",
+      "type": "city",
+      "refId": "ubud",
+      "query": "Ubud",
+      "timestamp": "2025-05-10T14:23:00Z"
+    },
+    {
+      "id": "h002",
+      "type": "place",
+      "refId": "tegalalang",
+      "query": "Tegalalang Rice Terraces",
+      "timestamp": "2025-05-09T10:05:42Z"
+    },
+    {
+      "id": "h003",
+      "type": "place",
+      "refId": "naughty_nuri",
+      "query": "Naughty Nuri's Warung",
+      "timestamp": "2025-05-08T18:45:12Z"
+    }
+  ]
+}

@@ -39,4 +39,8 @@ linux/Flutter/ephemeral/
 
 # Other
 **/GeneratedPluginRegistrant.*
+<<<<<<< HEAD
 pubspec.lock
+=======
+pubspec.lock
+>>>>>>> Favian

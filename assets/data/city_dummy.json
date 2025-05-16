@@ -1,0 +1,33 @@
+{
+  "id": "ubud",
+  "budget": {
+    "currency": "IDR",
+    "required": 1000000
+  },
+  "duration": {
+    "recommended": 5
+  },
+  "weather": {
+    "temperature": "27-32°C",
+    "condition": "Tropical, humid"
+  },
+  "crimeIndex": {
+    "Cindex": "Low",
+    "status": "Generally safe for tourists, but be aware of petty theft."
+  },
+  "visa": {
+    "status": "Visa-free",
+    "req": "Many nationalities can enter Indonesia without a visa for tourism purposes for up to 30 days. Check specific requirements based on your nationality."
+  },
+  "language": {
+    "name": "Balinese, Indonesian",
+    "detail": "Balinese is widely spoken, but Indonesian is the national language and understood everywhere. English is also spoken in tourist areas."
+  },
+  "transport": "Flights from Jakarta to Denpasar (Bali's airport), then taxi or private transfer to Ubud.",
+  "events": [
+    {
+      "name": "Cultural",
+      "details": "Ubud Writers & Readers Festival (October)"
+    }
+  ]
+}

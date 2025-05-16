@@ -38,8 +38,15 @@ class AuthPageState extends State<AuthPage>
     _panelOffset = Tween<double>(begin: .25, end: .15)
         .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
 
-    Future.delayed(const Duration(milliseconds: 500), () => setState(() => _showTitle = true));
-    Future.delayed(const Duration(milliseconds: 1200), () => setState(() => _showSubtitle = true));
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      setState(() => _showTitle = true);
+    });
+
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (!mounted) return;
+      setState(() => _showSubtitle = true);
+    });
   }
 
   @override

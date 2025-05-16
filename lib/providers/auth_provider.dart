@@ -71,27 +71,17 @@ class AuthProvider with ChangeNotifier {
     checkStoredAuth();
   }
 
-  // Check for stored authentication when app launches
   Future<void> checkStoredAuth() async {
     final prefs = await SharedPreferences.getInstance();
     final storedToken = prefs.getString('token');
-    // final storedUserJson = prefs.getString('user');
 
-    // if (storedToken != null && storedUserJson != null) {
     if (storedToken != null) {
 
       _token = storedToken;
-      // _user = User.fromJson(json.decode(storedUserJson));
-
-      // Log here
-      print('[RESTORE] Token from SharedPreferences: $_token');
-      // print('[RESTORE] User: ${_user?.toJson()}');
-
       notifyListeners();
     }
   }
 
-  // Login method
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     _errorMessage = null;

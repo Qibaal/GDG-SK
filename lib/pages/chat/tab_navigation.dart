@@ -1,5 +1,3 @@
-// lib/pages/chat/tab_navigation.dart
-
 import 'package:flutter/material.dart';
 
 class TabNavigation extends StatelessWidget implements PreferredSizeWidget {

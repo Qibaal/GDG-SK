@@ -1,5 +1,3 @@
-// lib/pages/auth/auth_page.dart
-
 import 'package:flutter/material.dart';
 import 'login_form.dart';
 import 'signup_form.dart';
@@ -67,7 +65,6 @@ class AuthPageState extends State<AuthPage>
     return Scaffold(
       body: SafeArea(
         child: Stack(children: [
-          // curved top-left corner
           const Positioned(
             top: 0, left: 0,
             child: SizedBox(
@@ -81,10 +78,8 @@ class AuthPageState extends State<AuthPage>
             ),
           ),
 
-          // Hello! header
           AuthHeader(showTitle: _showTitle, showSubtitle: _showSubtitle),
 
-          // sliding panel
           AnimatedBuilder(
             animation: _panelOffset,
             builder: (ctx, _) {
@@ -99,7 +94,6 @@ class AuthPageState extends State<AuthPage>
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                     child: Stack(children: [
-                      // Login form
                       SlideTransition(
                         position: _loginSlide,
                         child: FadeTransition(
@@ -107,7 +101,6 @@ class AuthPageState extends State<AuthPage>
                           child: LoginForm(isVisible: _isLogin, onSignUpPressed: _toggle),
                         ),
                       ),
-                      // Sign-up form
                       SlideTransition(
                         position: _signupSlide,
                         child: FadeTransition(

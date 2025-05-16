@@ -1,5 +1,3 @@
-// lib/pages/auth/signup_form.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gemexplora/widgets/auth_gate.dart';
@@ -43,7 +41,6 @@ class SignUpFormState extends State<SignUpForm> {
   Future<void> _handleGoogleSignIn() async {
     final auth = context.read<AuthProvider>();
 
-    // Show loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -53,7 +50,7 @@ class SignUpFormState extends State<SignUpForm> {
     final success = await auth.signInWithGoogle();
 
     if (!mounted) return;
-    Navigator.of(context).pop(); // Dismiss loading dialog
+    Navigator.of(context).pop(); 
 
     if (success) {
       Navigator.pushReplacement(
@@ -131,7 +128,6 @@ class SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 30),
 
-            // Full Name
             InputField(
               controller: _nameController,
               hintText: 'Full Name',
@@ -141,7 +137,6 @@ class SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 16),
 
-            // Email
             InputField(
               controller: _emailController,
               hintText: 'Email',
@@ -155,7 +150,6 @@ class SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 16),
 
-            // Password
             InputField(
               controller: _passwordController,
               hintText: 'Password',
@@ -176,7 +170,6 @@ class SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 16),
 
-            // Confirm Password
             InputField(
               controller: _confirmController,
               hintText: 'Confirm Password',
@@ -197,7 +190,6 @@ class SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 40),
 
-            // Sign Up Button
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -221,7 +213,6 @@ class SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 25),
 
-            // Already have an account?
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const Text(
                 'Already have an account? ',
@@ -240,7 +231,6 @@ class SignUpFormState extends State<SignUpForm> {
             ]),
             const SizedBox(height: 30),
 
-            // Or Sign Up With
             Row(children: [
               Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
               const Padding(

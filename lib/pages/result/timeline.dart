@@ -156,7 +156,6 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
     final selectedDay = _tripDays[_selectedDayIndex];
     final budget = selectedDay.budget;
     
-    // Format currency
     final formatter = NumberFormat('#,###', 'id_ID');
     final formattedTotal = formatter.format(budget.amount);
     
@@ -236,7 +235,6 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   }
 
   Widget _buildBudgetCategoryCard(String title, int amount, String currency, IconData icon) {
-    // Format currency
     final formatter = NumberFormat('#,###', 'id_ID');
     final formattedAmount = formatter.format(amount);
     

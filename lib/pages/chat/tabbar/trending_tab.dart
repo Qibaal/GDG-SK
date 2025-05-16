@@ -1,5 +1,3 @@
-// lib/pages/chat/trending_tab.dart
-
 import 'package:flutter/material.dart';
 
 class TrendingTab extends StatelessWidget {

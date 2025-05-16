@@ -1,5 +1,3 @@
-// lib/pages/chat/chat_history_preview.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gemexplora/providers/auth_provider.dart';

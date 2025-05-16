@@ -6,25 +6,7 @@ class ApiService {
   final String baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8081';
   
   Future<Map<String, dynamic>> getUserSearchResult(String prompt, String token, String origin) async {
-    final url = Uri.parse('$baseUrl/dummy-search');
-    final resp = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({
-        'origin': origin, 
-        'prompt': prompt
-      }),
-    );
-    
-    if (resp.statusCode == 200) return jsonDecode(resp.body);
-    throw Exception('Search-handler failed (${resp.statusCode})');
-  }
-
-  Future<Map<String, dynamic>> getUserTripPlan(String prompt, String token, String origin) async {
-    final url = Uri.parse('$baseUrl/dummy-planner');
+    final url = Uri.parse('$baseUrl/search-handler');
     final resp = await http.post(
       url,
       headers: {
@@ -56,15 +38,12 @@ class ApiService {
       body: jsonEncode({'email': email}),
     );
     if (resp.statusCode == 200) {
-      // Decode into a List of records
       final List<dynamic> history = jsonDecode(resp.body) as List<dynamic>;
-      // Sort by CreatedAt (newest first)
       history.sort((a, b) {
         final dtA = DateTime.parse(a['CreatedAt'] as String);
         final dtB = DateTime.parse(b['CreatedAt'] as String);
         return dtB.compareTo(dtA);
       });
-      // If preview mode, take only first 5
       return isPreview ? history.take(5).toList() : history;
     }
     throw Exception('History fetch failed (${resp.statusCode})');

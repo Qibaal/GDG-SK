@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:gemexplora/services/image_service.dart';
 import 'package:gemexplora/pages/result/timeline.dart';
 
-// KEEP IMPORTS AND CLASS SIGNATURE
 class SearchResultPage extends StatefulWidget {
   
   final Map<String, dynamic> resultData;
@@ -42,13 +41,10 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     final isTimeline = (data['isTimeLine'] as bool?) ?? false;
-    print(const JsonEncoder.withIndent('  ').convert(data));
     if (isTimeline) {
-      // when isTimeLine == true, show your timeline screen
       return TimelinePage(resultData: data);
     }
 
-    // otherwise fall back to the existing “cards + tabs” UI
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -425,7 +421,6 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
     required String tagLine,
     required List<String> featureList,
   }) {
-    // KEEP THIS UI SECTION UNCHANGED
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(

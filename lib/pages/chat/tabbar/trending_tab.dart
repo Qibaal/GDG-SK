@@ -14,21 +14,21 @@ class TrendingTab extends StatelessWidget {
         description: 'Popular destinations travelers are loving',
         children: [
           DestinationCard(
-            imageUrl: 'https://source.unsplash.com/random/300x200/?bali',
+            imageUrl: 'assets/bali.jpg',
             title: 'Bali, Indonesia',
             location: 'Island Paradise',
             rating: 4.8,
             tags: ['Beach', 'Culture', 'Relaxation'],
           ),
           DestinationCard(
-            imageUrl: 'https://source.unsplash.com/random/300x200/?kyoto',
+            imageUrl: 'assets/kyoto.jpg',
             title: 'Kyoto, Japan',
             location: 'Historic City',
             rating: 4.9,
             tags: ['Temples', 'Gardens', 'Tradition'],
           ),
           DestinationCard(
-            imageUrl: 'https://source.unsplash.com/random/300x200/?santorini',
+            imageUrl: 'assets/santorini.jpg',
             title: 'Santorini, Greece',
             location: 'Aegean Sea',
             rating: 4.7,
@@ -42,21 +42,21 @@ class TrendingTab extends StatelessWidget {
         description: 'Perfect destinations packed with fun for all ages',
         children: [
           DestinationCard(
-            imageUrl: 'https://source.unsplash.com/random/300x200/?orlando',
+            imageUrl: 'assets/orlando.jpg',
             title: 'Orlando, USA',
             location: 'Theme Park Capital',
             rating: 4.8,
             tags: ['Kids', 'Theme Parks', 'Adventure'],
           ),
           DestinationCard(
-            imageUrl: 'https://source.unsplash.com/random/300x200/?kyoto',
+            imageUrl: 'assets/kyoto.jpg',
             title: 'Kyoto, Japan',
             location: 'Cultural Wonderland',
             rating: 4.7,
             tags: ['Culture', 'Nature', 'Family'],
           ),
           DestinationCard(
-            imageUrl: 'https://source.unsplash.com/random/300x200/?goldcoast',
+            imageUrl: 'assets/goldcoast.jpg',
             title: 'Gold Coast, Australia',
             location: 'Sun & Surf Haven',
             rating: 4.6,

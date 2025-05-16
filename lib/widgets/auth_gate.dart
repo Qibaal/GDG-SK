@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gemexplora/providers/auth_provider.dart';
-import 'package:gemexplora/chat_screen.dart';
-import 'package:gemexplora/login_signup.dart';
+import 'package:gemexplora/pages/chat/chat_screen.dart';
+import 'package:gemexplora/pages/auth/auth_page.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -18,7 +18,7 @@ class AuthGate extends StatelessWidget {
     }
 
     return authProvider.isAuthenticated
-        ? const ChatScreen()
-        : const AuthPage();
+      ? ChatScreen()
+      : const AuthPage();
   }
 }

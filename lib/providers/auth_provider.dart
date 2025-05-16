@@ -52,15 +52,17 @@ class AuthProvider with ChangeNotifier {
   Future<void> checkStoredAuth() async {
     final prefs = await SharedPreferences.getInstance();
     final storedToken = prefs.getString('token');
-    final storedUserJson = prefs.getString('user');
+    // final storedUserJson = prefs.getString('user');
 
-    if (storedToken != null && storedUserJson != null) {
+    // if (storedToken != null && storedUserJson != null) {
+    if (storedToken != null) {
+
       _token = storedToken;
-      _user = User.fromJson(json.decode(storedUserJson));
+      // _user = User.fromJson(json.decode(storedUserJson));
 
       // Log here
       print('[RESTORE] Token from SharedPreferences: $_token');
-      print('[RESTORE] User: ${_user?.toJson()}');
+      // print('[RESTORE] User: ${_user?.toJson()}');
 
       notifyListeners();
     }
@@ -85,16 +87,16 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode >= 200 && response.statusCode < 300 && data['token'] != null) {
         // Store token and user info
         _token = data['token'];
-        _user = User.fromJson(data['user']);
+        // _user = User.fromJson(data['user']);
 
         // Log here
         print('[LOGIN] Token set: $_token');
-        print('[LOGIN] User: ${_user?.toJson()}');
+        // print('[LOGIN] User: ${_user?.toJson()}');
 
         // Save to SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', _token!);
-        await prefs.setString('user', jsonEncode(_user!.toJson()));
+        // await prefs.setString('user', jsonEncode(_user!.toJson()));
 
         _isLoading = false;
         notifyListeners();
@@ -157,10 +159,10 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
-    await prefs.remove('user');
+    // await prefs.remove('user');
 
     _token = null;
-    _user = null;
+    // _user = null;
     _errorMessage = null;
     notifyListeners();
   }

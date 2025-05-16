@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gemexplora/splash_screen.dart';
-import 'package:gemexplora/provider_setup.dart';
+import 'package:gemexplora/widgets/splash_screen.dart';
+import 'package:gemexplora/providers/provider_setup.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gemexplora/widgets/auth_gate.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

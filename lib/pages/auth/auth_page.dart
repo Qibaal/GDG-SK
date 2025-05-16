@@ -1,10 +1,12 @@
+// lib/pages/auth/auth_page.dart
+
 import 'package:flutter/material.dart';
-import 'package:gemexplora/pages/auth/login_form.dart';
-import 'package:gemexplora/pages/auth/signup_form.dart';
+import 'login_form.dart';
+import 'signup_form.dart';
 import 'package:gemexplora/widgets/auth_header.dart';
 
 class AuthPage extends StatefulWidget {
-  const AuthPage({super.key});
+  const AuthPage({Key? key}) : super(key: key);
   @override
   AuthPageState createState() => AuthPageState();
 }
@@ -13,9 +15,8 @@ class AuthPageState extends State<AuthPage>
     with SingleTickerProviderStateMixin {
   bool _isLogin = true, _showTitle = false, _showSubtitle = false;
   late final AnimationController _animationController;
-  late final Animation<Offset> _loginSlideAnimation, _signUpSlideAnimation;
-  late final Animation<double> _loginOpacityAnimation, _signUpOpacityAnimation;
-  late final Animation<double> _containerPositionAnimation;
+  late final Animation<Offset> _loginSlide, _signupSlide;
+  late final Animation<double> _loginFade, _signupFade, _panelOffset;
 
   @override
   void initState() {
@@ -23,15 +24,18 @@ class AuthPageState extends State<AuthPage>
     _animationController = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 500),
     );
-    _loginSlideAnimation = Tween<Offset>(begin: Offset.zero, end: const Offset(-1.5, 0))
+
+    _loginSlide = Tween<Offset>(begin: Offset.zero, end: const Offset(-1.5, 0))
         .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
-    _loginOpacityAnimation = Tween<double>(begin: 1, end: 0)
+    _loginFade = Tween<double>(begin: 1, end: 0)
         .animate(CurvedAnimation(parent: _animationController, curve: const Interval(0, .5, curve: Curves.easeOut)));
-    _signUpSlideAnimation = Tween<Offset>(begin: const Offset(1.5, 0), end: Offset.zero)
+
+    _signupSlide = Tween<Offset>(begin: const Offset(1.5, 0), end: Offset.zero)
         .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
-    _signUpOpacityAnimation = Tween<double>(begin: 0, end: 1)
+    _signupFade = Tween<double>(begin: 0, end: 1)
         .animate(CurvedAnimation(parent: _animationController, curve: const Interval(.5, 1, curve: Curves.easeIn)));
-    _containerPositionAnimation = Tween<double>(begin: .25, end: .15)
+
+    _panelOffset = Tween<double>(begin: .25, end: .15)
         .animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
 
     Future.delayed(const Duration(milliseconds: 500), () => setState(() => _showTitle = true));
@@ -44,7 +48,7 @@ class AuthPageState extends State<AuthPage>
     super.dispose();
   }
 
-  void _toggleForm() {
+  void _toggle() {
     if (_isLogin) _animationController.forward();
     else _animationController.reverse();
     setState(() => _isLogin = !_isLogin);
@@ -52,46 +56,56 @@ class AuthPageState extends State<AuthPage>
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    final h = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SafeArea(
         child: Stack(children: [
-          // the curved header + hello text
+          // curved top-left corner
+          const Positioned(
+            top: 0, left: 0,
+            child: SizedBox(
+              width: 120, height: 120,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.only(bottomRight: Radius.circular(120)),
+                ),
+              ),
+            ),
+          ),
+
+          // Hello! header
           AuthHeader(showTitle: _showTitle, showSubtitle: _showSubtitle),
 
           // sliding panel
           AnimatedBuilder(
-            animation: _containerPositionAnimation,
+            animation: _panelOffset,
             builder: (ctx, _) {
-              final top = height * _containerPositionAnimation.value;
+              final top = h * _panelOffset.value;
               return Positioned(
                 top: top, left: 0, right: 0, bottom: 0,
                 child: Container(
                   decoration: const BoxDecoration(
                     color: Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                   ),
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                     child: Stack(children: [
+                      // Login form
                       SlideTransition(
-                        position: _loginSlideAnimation,
+                        position: _loginSlide,
                         child: FadeTransition(
-                          opacity: _loginOpacityAnimation,
-                          child: LoginForm(isVisible: _isLogin, onSignUpPressed: _toggleForm),
+                          opacity: _loginFade,
+                          child: LoginForm(isVisible: _isLogin, onSignUpPressed: _toggle),
                         ),
                       ),
+                      // Sign-up form
                       SlideTransition(
-                        position: _signUpSlideAnimation,
+                        position: _signupSlide,
                         child: FadeTransition(
-                          opacity: _signUpOpacityAnimation,
-                          child: SignUpForm(isVisible: !_isLogin, onLoginPressed: _toggleForm),
+                          opacity: _signupFade,
+                          child: SignUpForm(isVisible: !_isLogin, onLoginPressed: _toggle),
                         ),
                       ),
                     ]),

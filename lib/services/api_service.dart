@@ -23,7 +23,7 @@ class ApiService {
     throw Exception('Search-handler failed (${resp.statusCode})');
   }
 
-  Future<Map<String, dynamic>> getUserTripPlan(String prompt, String token, String origin) async {
+  Future<Map<String, dynamic>> getUserTripPlan(String prompt, String token, String origin, Uri url) async {
     final resp = await http.post(
       url,
       headers: {

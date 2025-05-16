@@ -230,27 +230,8 @@ class SignUpFormState extends State<SignUpForm> {
             ]),
             const SizedBox(height: 30),
 
-            Row(children: [
-              Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  'Or Sign Up With',
-                  style: TextStyle(color: Color(0xFF858C95)),
-                ),
-              ),
-              Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-            ]),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: _handleGoogleSignIn,
-                  child: const SocialButton('assets/google.png'),
-                ),
-              ],
-            ),
+            
+            
           ]),
         ),
       ),

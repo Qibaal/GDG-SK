@@ -91,7 +91,7 @@ class _ChatScreenState extends State<ChatScreen>
                               Container(
                                 padding: EdgeInsets.all(2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.accentBlue.withOpacity(0.1),
+                                  color: AppColors.accentBlue,
                                   borderRadius: BorderRadius.circular(24),
                                 ),
                                 child: Icon(
@@ -153,7 +153,7 @@ class _ChatScreenState extends State<ChatScreen>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black,
                     blurRadius: 8,
                     offset: Offset(0, -2),
                   ),

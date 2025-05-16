@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gemexplora/providers/auth_provider.dart';
 
-// Wrap your app or main widget with this MultiProvider
 class AppProviders extends StatelessWidget {
   final Widget child;
 
@@ -13,7 +12,6 @@ class AppProviders extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        // Add other providers here if needed
       ],
       child: child,
     );

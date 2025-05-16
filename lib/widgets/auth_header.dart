@@ -7,7 +7,6 @@ class AuthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
-      // the curved corner
       Positioned(
         top: 0, left: 0,
         child: Container(
@@ -18,7 +17,6 @@ class AuthHeader extends StatelessWidget {
           ),
         ),
       ),
-      // Hello! + subtitle
       Positioned(
         top: 90, left: 20,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

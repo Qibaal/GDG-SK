@@ -118,13 +118,13 @@ class DestinationCard extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFF858C95).withOpacity(0.7),
-            const Color(0xFF90E0EF).withOpacity(0.7),
+            const Color(0xFF858C95),
+            const Color(0xFF90E0EF),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF48CAE4).withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4)),
+          BoxShadow(color: const Color(0xFF48CAE4), blurRadius: 8, offset: const Offset(0, 4)),
         ],
       ),
       child: ClipRRect(

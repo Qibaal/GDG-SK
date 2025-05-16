@@ -1,4 +1,3 @@
-// lib/widgets/loading_screen.dart
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -50,11 +49,10 @@ class _LoadingScreenState extends State<LoadingScreen> with TickerProviderStateM
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Blur background
         BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
           child: Container(
-            color: Colors.black.withOpacity(0.4), // dark overlay
+            color: Colors.black, 
           ),
         ),
         Center(
@@ -103,7 +101,7 @@ class _LoadingScreenState extends State<LoadingScreen> with TickerProviderStateM
       child: CustomPaint(
         painter: _KitePainter(
           color: _gemColors[index],
-          shadowColor: _gemColors[index].withOpacity(0.5),
+          shadowColor: _gemColors[index],
           size: size * 2.4,
         ),
       ),

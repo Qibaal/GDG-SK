@@ -38,7 +38,6 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   @override
   void initState() {
     super.initState();
-    // parse the JSON you already have:
     _tripName = widget.resultData['tripName'] as String? ?? '';
     _tripDays = (widget.resultData['days'] as List<dynamic>)
         .cast<Map<String, dynamic>>()
@@ -301,13 +300,11 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ─── Timeline column ────────────────────────────────
               SizedBox(
                 width: 30,
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    // Top line
                     if (!isFirst)
                       SizedBox(
                         width: 2,
@@ -320,7 +317,6 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                         ),
                       ),
                     
-                    // Dot
                     Container(
                       width: 30,
                       height: 30,
@@ -331,7 +327,6 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                       ),
                     ),
                     
-                    // Bottom line grows to fill rest of the row
                     if (!isLast)
                       Expanded(
                         child: SizedBox(
@@ -351,7 +346,6 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
               
               const SizedBox(width: 16),
               
-              // ─── Activity card ────────────────────────────────────
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
@@ -368,7 +362,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   Color _getActivityColor(String type) {
     switch (type) {
       case 'FLIGHT':
-        return Color(0xFFE67E22); // Changed to orange to match the image
+        return Color(0xFFE67E22); 
       case 'HOTEL':
         return Color(0xFFE67E22);
       case 'ACTIVITY':
@@ -497,7 +491,6 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   }
 }
 
-// Custom painter to draw a dashed line
 class DashedLinePainter extends CustomPainter {
   final Color color;
   final double dashLength;
@@ -518,13 +511,11 @@ class DashedLinePainter extends CustomPainter {
 
     double startY = 0;
     while (startY < size.height) {
-      // Draw a dash
       canvas.drawLine(
         Offset(size.width / 2, startY),
         Offset(size.width / 2, startY + dashLength),
         paint,
       );
-      // Move to next dash position
       startY += dashLength + dashGap;
     }
   }

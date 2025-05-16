@@ -19,20 +19,18 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
   bool _fadeOut = false;
-  // Controllers for the gem animations
   late AnimationController _rotationController;
   late AnimationController _scaleController;
   late AnimationController _textController;
   
-  // Animation sequences for each gem
   late List<Animation<double>> _gemAnimations;
   
   final List<Color> _gemColors = [
-    const Color(0xFFB5B8E8), // Light purple
-    const Color(0xFF7E6ED1), // Dark purple
-    const Color(0xFF9DE4F3), // Light blue
-    const Color(0xFF00B2C2), // Teal
-    const Color(0xFF00A0B4), // Dark teal
+    const Color(0xFFB5B8E8), 
+    const Color(0xFF7E6ED1), 
+    const Color(0xFF9DE4F3), 
+    const Color(0xFF00B2C2), 
+    const Color(0xFF00A0B4), 
   ];
   
   final Duration _rotationDuration = const Duration(milliseconds: 5000);
@@ -43,28 +41,23 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   void initState() {
     super.initState();
     
-    // Rotation controller for all gems
     _rotationController = AnimationController(
       duration: _rotationDuration,
       vsync: this,
     );
     
-    // Scale controller for growing gems
     _scaleController = AnimationController(
       duration: _scaleDuration,
       vsync: this,
     );
     
-    // Text animation controller
     _textController = AnimationController(
       duration: _textDuration,
       vsync: this,
     );
     
-    // Create staggered animations for each gem
     _gemAnimations = List.generate(5, (index) {
-      final startDelay = index * 0.15; // Stagger the start times
-      // Ensuring the end value is <= 1.0 to fix the assertion error
+      final startDelay = index * 0.15; 
       final endTime = math.min(startDelay + 0.6, 1.0);
       return CurvedAnimation(
         parent: _scaleController,
@@ -76,7 +69,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       );
     });
     
-    // Start the sequence
     _startAnimationSequence();
   }
   
@@ -163,8 +155,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                       fontSize: 50,
                       fontWeight: FontWeight.bold,
                       color: index < 3
-                      ? const Color(0xFF735CA4) // Gem
-                      : const Color(0xFF3793DA), // Explora
+                      ? const Color(0xFF735CA4)
+                      : const Color(0xFF3793DA), 
                       shadows: [
                         Shadow(
                           blurRadius: 2.0,
@@ -186,7 +178,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 24, 24, 136), // background color
+      backgroundColor: const Color.fromARGB(255, 24, 24, 136), 
       body: AnimatedOpacity(
         opacity: _fadeOut ? 0.0 : 1.0,
         duration: const Duration(milliseconds: 800),
@@ -198,7 +190,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
           }
         },
         child: Container(
-          color: const Color.fromARGB(255, 24, 24, 136), // ⬅️ move the background here
+          color: const Color.fromARGB(255, 24, 24, 136), 
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -229,22 +221,16 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   Widget _buildGem(int index) {
-    // Calculate position on a circle path
     final angle = _rotationController.value * 2 * math.pi + 
                   (index * (2 * math.pi / 5)) - (math.pi / 2);
-    
-    // Radius of the circle path
     final radius = 120.0;
     
-    // Calculate x and y position
     final x = math.cos(angle) * radius;
     final y = math.sin(angle) * radius;
     
-    // Calculate size based on animation
     final size = 70.0 * _gemAnimations[index].value;
     
-    // Calculate rotation for each gem
-    final rotation = angle + math.pi / 4; // 45 degrees offset
+    final rotation = angle + math.pi / 4; 
     
     return Transform.translate(
       offset: Offset(x, y),
@@ -265,7 +251,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       child: CustomPaint(
         painter: _KitePainter(
           color: _gemColors[index],
-          shadowColor: _gemColors[index].withOpacity(0.5),
+          shadowColor: _gemColors[index],
           size: size*2.4,
         ),
       ),
@@ -295,7 +281,6 @@ class _KitePainter extends CustomPainter {
       ..color = shadowColor
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
 
-    // Customize each side's length relative to total `size`
     final double topLength = size * 0.4;
     final double bottomLength = size * 0.6;
     final double leftLength = size * 0.3;
@@ -305,18 +290,17 @@ class _KitePainter extends CustomPainter {
     final centerY = canvasSize.height / 2;
 
     final path = Path()
-      ..moveTo(centerX, centerY - topLength) // Top
-      ..lineTo(centerX + rightLength, centerY) // Right
-      ..lineTo(centerX, centerY + bottomLength) // Bottom
-      ..lineTo(centerX - leftLength, centerY) // Left
+      ..moveTo(centerX, centerY - topLength) 
+      ..lineTo(centerX + rightLength, centerY) 
+      ..lineTo(centerX, centerY + bottomLength) 
+      ..lineTo(centerX - leftLength, centerY) 
       ..close();
 
     canvas.drawPath(path, shadowPaint);
     canvas.drawPath(path, paint);
 
-    // Optional highlight
     final highlight = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
     canvas.drawPath(path, highlight);
@@ -334,7 +318,7 @@ class GemShinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white
       ..style = PaintingStyle.fill;
     
     final path = Path()

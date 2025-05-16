@@ -6,7 +6,7 @@ class ApiService {
   final String baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8081';
   
   Future<Map<String, dynamic>> getUserSearchResult(String prompt, String token, String origin) async {
-    final url = Uri.parse('$baseUrl/dummy-search');
+    final url = Uri.parse('$baseUrl/search-handler');
     final resp = await http.post(
       url,
       headers: {
@@ -24,7 +24,6 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> getUserTripPlan(String prompt, String token, String origin) async {
-    final url = Uri.parse('$baseUrl/dummy-planner');
     final resp = await http.post(
       url,
       headers: {

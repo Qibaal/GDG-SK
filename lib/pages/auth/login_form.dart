@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:gemexplora/widgets/auth_gate.dart';
 import 'package:gemexplora/providers/auth_provider.dart';
 import 'package:gemexplora/widgets/input_field.dart';
-import 'package:gemexplora/widgets/social_button.dart';
 
 class LoginForm extends StatefulWidget {
   final bool isVisible;
@@ -159,32 +158,7 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
             const SizedBox(height: 25),
-            Row(
-              children: [
-                Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'Or login with',
-                    style: TextStyle(
-                      color: Color(0xFF858C95),
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-              ],
-            ),
-            const SizedBox(height: 25),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: _handleGoogleSignIn,
-                  child: const SocialButton('assets/google.png'),
-                ),
-              ],
-            ),
+                       
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -1,5 +1,3 @@
-// lib/pages/chat/search_bar.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gemexplora/providers/auth_provider.dart';
@@ -85,7 +83,6 @@ class _SearchBarState extends State<SearchBar> {
 
     final token = context.read<AuthProvider>().token!;
 
-    // Show overlay loading
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -96,7 +93,7 @@ class _SearchBarState extends State<SearchBar> {
     try {
       final resultData = await _api.getUserSearchResult(query, token, widget.origin);
       if (!mounted) return;
-      Navigator.pop(context); // remove loading screen
+      Navigator.pop(context);
 
       Navigator.push(
         context,
@@ -106,7 +103,7 @@ class _SearchBarState extends State<SearchBar> {
       );
     } catch (e) {
       if (mounted) {
-        Navigator.pop(context); // remove loading screen
+        Navigator.pop(context); 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }

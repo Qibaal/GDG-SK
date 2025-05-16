@@ -29,13 +29,10 @@ class _ChatScreenState extends State<ChatScreen>
   void initState() {
     super.initState();
 
-    // _fetchOrigin();
     _origin = 'Jakarta';
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
-      debugPrint('TOKEN in ChatScreen: ${auth.token}');
-      debugPrint('Origin in ChatScreen: $_origin');
     });
   }
 
@@ -53,14 +50,12 @@ class _ChatScreenState extends State<ChatScreen>
     return Scaffold(
       body: SafeArea(
         child: Stack(fit: StackFit.expand, children: [
-          // Background with soft pastel blue
           Container(
             decoration: const BoxDecoration(
               color: AppColors.lightPastelBlue,
             ),
           ),
           
-          // Main content with sliver header and tabs
           NestedScrollView(
             headerSliverBuilder: (ctx, innerBoxIsScrolled) => [
               SliverAppBar(
@@ -96,7 +91,7 @@ class _ChatScreenState extends State<ChatScreen>
                               Container(
                                 padding: EdgeInsets.all(2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.accentBlue.withOpacity(0.1),
+                                  color: AppColors.accentBlue,
                                   borderRadius: BorderRadius.circular(24),
                                 ),
                                 child: Icon(
@@ -158,7 +153,7 @@ class _ChatScreenState extends State<ChatScreen>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black,
                     blurRadius: 8,
                     offset: Offset(0, -2),
                   ),
@@ -170,7 +165,7 @@ class _ChatScreenState extends State<ChatScreen>
                   topLeft: Radius.circular(24),
                   topRight: Radius.circular(24),
                 ),
-                child: Column( // 👈 ubah jadi Column
+                child: Column(
                   children: [
                     const Expanded(child: TrendingTab()),
                     Padding(
@@ -178,7 +173,7 @@ class _ChatScreenState extends State<ChatScreen>
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           final auth = context.read<AuthProvider>();
-                          await auth.logout(); // Trigger AuthGate rebuild
+                          await auth.logout();
                         },
                         icon: const Icon(Icons.logout),
                         label: const Text('Logout'),

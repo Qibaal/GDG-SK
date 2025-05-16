@@ -12,7 +12,6 @@ class ChatHistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final token = context.read<AuthProvider>().token!;
-    print('📧 Email in ChatHistoryPage: $email');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat History'),

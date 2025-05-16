@@ -1,5 +1,3 @@
-// lib/pages/chat/tab_navigation.dart
-
 import 'package:flutter/material.dart';
 
 class TabNavigation extends StatelessWidget implements PreferredSizeWidget {
@@ -12,7 +10,7 @@ class TabNavigation extends StatelessWidget implements PreferredSizeWidget {
       height: 48,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF858C95).withOpacity(0.3),
+        color: const Color(0xFF858C95),
         border: Border.all(color: const Color(0xFF858C95)),
         borderRadius: BorderRadius.circular(8),
       ),

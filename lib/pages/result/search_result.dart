@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+
+import 'package:gemexplora/services/image_service.dart';
 import 'package:gemexplora/pages/result/timeline.dart';
 
-// KEEP IMPORTS AND CLASS SIGNATURE
 class SearchResultPage extends StatefulWidget {
   
   final Map<String, dynamic> resultData;
@@ -40,11 +42,9 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
   Widget build(BuildContext context) {
     final isTimeline = (data['isTimeLine'] as bool?) ?? false;
     if (isTimeline) {
-      // when isTimeLine == true, show your timeline screen
       return TimelinePage(resultData: data);
     }
 
-    // otherwise fall back to the existing “cards + tabs” UI
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -137,7 +137,7 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
           Row(
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage('assets/city.png'),
+                backgroundImage: AssetImage('assets/city.jpg'),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -421,7 +421,6 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
     required String tagLine,
     required List<String> featureList,
   }) {
-    // KEEP THIS UI SECTION UNCHANGED
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -442,8 +441,8 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.network(
-                  imageUrl,
+                child: Image.asset(
+                  getImageAssetByTitle(title),
                   height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,

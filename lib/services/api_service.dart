@@ -55,15 +55,12 @@ class ApiService {
       body: jsonEncode({'email': email}),
     );
     if (resp.statusCode == 200) {
-      // Decode into a List of records
       final List<dynamic> history = jsonDecode(resp.body) as List<dynamic>;
-      // Sort by CreatedAt (newest first)
       history.sort((a, b) {
         final dtA = DateTime.parse(a['CreatedAt'] as String);
         final dtB = DateTime.parse(b['CreatedAt'] as String);
         return dtB.compareTo(dtA);
       });
-      // If preview mode, take only first 5
       return isPreview ? history.take(5).toList() : history;
     }
     throw Exception('History fetch failed (${resp.statusCode})');

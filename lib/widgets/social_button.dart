@@ -12,7 +12,7 @@ class SocialButton extends StatelessWidget {
       backgroundColor: Colors.white,
       padding: const EdgeInsets.all(12),
       elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black,
     ),
     child: Image.asset(assetPath, width: 30, height: 30, fit: BoxFit.contain),
   );

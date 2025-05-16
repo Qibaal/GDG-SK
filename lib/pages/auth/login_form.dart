@@ -1,5 +1,3 @@
-// lib/pages/auth/login_form.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gemexplora/widgets/auth_gate.dart';
@@ -34,7 +32,6 @@ class _LoginFormState extends State<LoginForm> {
   Future<void> _handleGoogleSignIn() async {
     final auth = context.read<AuthProvider>();
 
-    // Show loading indicator
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -44,7 +41,7 @@ class _LoginFormState extends State<LoginForm> {
     final success = await auth.signInWithGoogle();
 
     if (!mounted) return;
-    Navigator.of(context).pop(); // Dismiss loading dialog
+    Navigator.of(context).pop();
 
     if (success) {
       Navigator.pushReplacement(
@@ -62,7 +59,6 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _handleLogin() async {
-    print('[LOGIN FORM] Login button pressed');
     final auth = context.read<AuthProvider>();
     final success = await auth.login(
       _emailCtrl.text.trim(),

@@ -47,6 +47,7 @@ class ApiService {
     bool isPreview = false,
   }) async {
     final url = Uri.parse('$baseUrl/prompts');
+    print("email: $email");
     final resp = await http.post(
       url,
       headers: {

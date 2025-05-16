@@ -36,6 +36,23 @@ class User {
   };
 }
 
+Map<String, dynamic> parseJwt(String token) {
+  final parts = token.split('.');
+  if (parts.length != 3) {
+    throw Exception('Invalid token');
+  }
+
+  final payload = parts[1];
+  final normalized = base64Url.normalize(payload);
+  final payloadMap = json.decode(utf8.decode(base64Url.decode(normalized)));
+
+  if (payloadMap is! Map<String, dynamic>) {
+    throw Exception('Invalid payload');
+  }
+
+  return payloadMap;
+}
+
 class AuthProvider with ChangeNotifier {
   String? _token;
   User? _user;
@@ -87,22 +104,26 @@ class AuthProvider with ChangeNotifier {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );
+      print('[LOGIN DEBUG] response.body: ${response.body}');
 
       final data = jsonDecode(response.body);
 
       if (response.statusCode >= 200 && response.statusCode < 300 && data['token'] != null) {
-        // Store token and user info
         _token = data['token'];
-        // _user = User.fromJson(data['user']);
 
-        // Log here
-        print('[LOGIN] Token set: $_token');
-        // print('[LOGIN] User: ${_user?.toJson()}');
+        // ✅ Decode email dan id dari token
+        final decoded = parseJwt(_token!);
+        final email = decoded['email'] ?? '';
+        final id = decoded['sub']?.toString() ?? '';
+        _user = User(id: id, name: '', email: email);
+
+        // Log untuk debug
+        print('[LOGIN] User from token: ${_user!.toJson()}');
 
         // Save to SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', _token!);
-        // await prefs.setString('user', jsonEncode(_user!.toJson()));
+        await prefs.setString('user', jsonEncode(_user!.toJson()));
 
         _isLoading = false;
         notifyListeners();
@@ -237,11 +258,11 @@ class AuthProvider with ChangeNotifier {
 
       if (response.statusCode >= 200 && response.statusCode < 300 && data['token'] != null) {
         _token = data['token'];
-        // _user = User.fromJson(data['user']);
+        _user = User.fromJson(data['user']);
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', _token!);
-        // await prefs.setString('user', jsonEncode(_user!.toJson()));
+        await prefs.setString('user', jsonEncode(_user!.toJson()));
 
         _isLoading = false;
         notifyListeners();

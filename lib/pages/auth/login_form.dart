@@ -63,6 +63,7 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _handleLogin() async {
+    print('[LOGIN FORM] Login button pressed');
     final auth = context.read<AuthProvider>();
     final success = await auth.login(
       _emailCtrl.text.trim(),

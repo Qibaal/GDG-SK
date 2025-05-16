@@ -45,14 +45,6 @@ class _ChatHistoryPreviewState extends State<ChatHistoryPreview> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '🕘 Recent Conversations',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
             const SizedBox(height: 8),
             if (history.isEmpty) ...[
               const Text('No recent chats'),

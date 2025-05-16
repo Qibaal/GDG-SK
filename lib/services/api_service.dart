@@ -47,7 +47,6 @@ class ApiService {
     bool isPreview = false,
   }) async {
     final url = Uri.parse('$baseUrl/prompts');
-    print("email: $email");
     final resp = await http.post(
       url,
       headers: {
@@ -70,33 +69,4 @@ class ApiService {
     }
     throw Exception('History fetch failed (${resp.statusCode})');
   }
-
-  // Future<List<dynamic>> getUserHistory(
-  //   String email,
-  //   String token, {
-  //   bool isPreview = false,
-  // }) async {
-  //   final url = Uri.parse('http://35.240.153.144:8081/prompts');
-  //   final resp = await http.post(
-  //     url,
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhaXphbi5pcWJhbEBnbWFpbC5jb20iLCJleHAiOjE3NDczNzg2MzUsInN1YiI6MX0.QKH0BA17Lc9G3-dVB4Bc4-xgtEEKyi1wJZoDX9PjoME',
-  //     },
-  //     body: jsonEncode({'email': "raizan.iqbal@gmail.com"}),
-  //   );
-  //   if (resp.statusCode == 200) {
-  //     // Decode into a List of records
-  //     final List<dynamic> history = jsonDecode(resp.body) as List<dynamic>;
-  //     // Sort by CreatedAt (newest first)
-  //     history.sort((a, b) {
-  //       final dtA = DateTime.parse(a['CreatedAt'] as String);
-  //       final dtB = DateTime.parse(b['CreatedAt'] as String);
-  //       return dtB.compareTo(dtA);
-  //     });
-  //     // If preview mode, take only first 5
-  //     return isPreview ? history.take(5).toList() : history;
-  //   }
-  //   throw Exception('History fetch failed (${resp.statusCode})');
-  // }
 }

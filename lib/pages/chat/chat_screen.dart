@@ -69,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen>
                     ? AppColors.lightPastelBlue
                     : Colors.transparent,
                 elevation: innerBoxIsScrolled ? 2 : 0,
-                expandedHeight: 320,
+                expandedHeight: 370,
                 
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
@@ -170,7 +170,29 @@ class _ChatScreenState extends State<ChatScreen>
                   topLeft: Radius.circular(24),
                   topRight: Radius.circular(24),
                 ),
-                child: const TrendingTab(),
+                child: Column( // 👈 ubah jadi Column
+                  children: [
+                    const Expanded(child: TrendingTab()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final auth = context.read<AuthProvider>();
+                          await auth.logout(); // Trigger AuthGate rebuild
+                        },
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Logout'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

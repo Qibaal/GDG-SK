@@ -49,6 +49,9 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            SliverToBoxAdapter(
+              child: SizedBox(height: kToolbarHeight),
+            ),
             _buildAppBar(),
             SliverToBoxAdapter(
               child: Column(
@@ -75,16 +78,6 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
       floating: true,
       title: const Text('Travel Search'),
       centerTitle: true,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: const Icon(Icons.account_circle_outlined),
-          onPressed: () {},
-        ),
-      ],
     );
   }
 

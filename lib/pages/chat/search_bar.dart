@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gemexplora/providers/auth_provider.dart';
 import 'package:gemexplora/services/api_service.dart';
+import 'package:gemexplora/widgets/loading_screen.dart';
 import 'package:gemexplora/pages/result/search_result.dart';
 
 class SearchBar extends StatefulWidget {
@@ -27,59 +28,53 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Row(
       children: [
-        TextField(
-          controller: _ctrl,
-          style: const TextStyle(color: Colors.black),
-          decoration: InputDecoration(
-            hintText: 'Search destinations, experiences...',
-            prefixIcon: const Icon(Icons.search, color: Color(0xFF858C95)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+        Expanded(
+          child: TextField(
+            controller: _ctrl,
+            style: const TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              hintText: 'Search destinations, experiences...',
+              prefixIcon: const Icon(Icons.search, color: Color(0xFF858C95)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
-          onSubmitted: (_) => _submit(),
         ),
-        if (_isLoading)
-          Positioned.fill(
-            child: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 16),
-              child: const SizedBox(
-                width: 24,
-                height: 24,
+        const SizedBox(width: 8),
+        _isLoading
+            ? const SizedBox(
+                width: 40,
+                height: 40,
                 child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          ),
-        Positioned(
-          right: 4,
-          top: 4,
-          bottom: 4,
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _submit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF59E0B),
-              foregroundColor: const Color(0xFF48CAE4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: const [
-              Icon(Icons.auto_awesome, size: 16, color: Colors.black),
-              SizedBox(width: 4),
-              Text(
-                'Discover',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              )
+            : ElevatedButton(
+                onPressed: _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF59E0B),
+                  foregroundColor: const Color(0xFF48CAE4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  minimumSize: const Size(0, 48),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.auto_awesome, size: 16, color: Colors.black),
+                    SizedBox(width: 4),
+                    Text(
+                      'Discover',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ]),
-          ),
-        ),
       ],
     );
   }
@@ -89,11 +84,20 @@ class _SearchBarState extends State<SearchBar> {
     if (query.isEmpty) return;
 
     final token = context.read<AuthProvider>().token!;
-    setState(() => _isLoading = true);
+
+    // Show overlay loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      builder: (_) => const LoadingScreen(),
+    );
 
     try {
       final resultData = await _api.getUserSearchResult(query, token, widget.origin);
       if (!mounted) return;
+      Navigator.pop(context); // remove loading screen
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -102,11 +106,9 @@ class _SearchBarState extends State<SearchBar> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        Navigator.pop(context); // remove loading screen
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 

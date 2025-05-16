@@ -57,28 +57,33 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
-        ),
-        title: Text(
-          '${_tripName}Trip Plan',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
       body: Column(
         children: [
-          _buildDaySelection(),
-          _buildBudgetSection(),
+          SizedBox(height: kToolbarHeight), 
+          AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {},
+            ),
+            title: Text(
+              '${_tripName}Trip Plan',
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            centerTitle: true,
+          ),
           Expanded(
-            child: _buildTimeline(),
+            child: Column(
+              children: [
+                _buildDaySelection(),
+                _buildBudgetSection(),
+                Expanded(child: _buildTimeline()),
+              ],
+            ),
           ),
         ],
       ),

@@ -20,7 +20,7 @@ class AuthHeader extends StatelessWidget {
       ),
       // Hello! + subtitle
       Positioned(
-        top: 200, left: 20,
+        top: 90, left: 20,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           AnimatedOpacity(
             duration: const Duration(milliseconds: 500),

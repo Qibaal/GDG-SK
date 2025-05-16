@@ -18,6 +18,7 @@ class SplashScreen extends StatefulWidget {
 
 
 class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  bool _fadeOut = false;
   // Controllers for the gem animations
   late AnimationController _rotationController;
   late AnimationController _scaleController;
@@ -80,7 +81,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
   
   void _startAnimationSequence() async {
-    // Start animations
     await Future.delayed(const Duration(milliseconds: 300));
     _rotationController.forward();
     _scaleController.forward();
@@ -88,13 +88,10 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     await Future.delayed(const Duration(milliseconds: 2500));
     _textController.forward();
 
-    // Wait for the total duration passed from main.dart
     await Future.delayed(widget.duration);
 
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => widget.nextScreen),
-    );
+    setState(() => _fadeOut = true);
   }
   
   @override
@@ -189,33 +186,43 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A1A), // Deep dark blue background
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Gems container
-            SizedBox(
-              height: 280,
-              width: 280,
-              child: AnimatedBuilder(
-                animation: Listenable.merge([_rotationController, _scaleController]),
-                builder: (context, child) {
-                  return Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Create each gem positioned in a circle
-                      for (int i = 0; i < 5; i++)
-                        _buildGem(i),
-                    ],
-                  );
-                },
-              ),
+      backgroundColor: const Color.fromARGB(255, 24, 24, 136), // background color
+      body: AnimatedOpacity(
+        opacity: _fadeOut ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 800),
+        onEnd: () {
+          if (_fadeOut) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => widget.nextScreen),
+            );
+          }
+        },
+        child: Container(
+          color: const Color.fromARGB(255, 24, 24, 136), // ⬅️ move the background here
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 280,
+                  width: 280,
+                  child: AnimatedBuilder(
+                    animation: Listenable.merge([_rotationController, _scaleController]),
+                    builder: (context, child) {
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          for (int i = 0; i < 5; i++) _buildGem(i),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 60),
+                _buildGemExploraText(),
+              ],
             ),
-            const SizedBox(height: 60),
-            // GemExplora text with mask animation
-            _buildGemExploraText(),
-          ],
+          ),
         ),
       ),
     );

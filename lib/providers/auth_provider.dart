@@ -1,8 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+
+final GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: ['email', 'profile'],
+  clientId: kIsWeb ? '112571618899-53i2orp47rs7m50rr160g27aeu5tjg7b.apps.googleusercontent.com' : null,
+);
 
 class User {
   final String id;
@@ -193,4 +199,65 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> signInWithGoogle() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Sign out first to avoid cached session
+      if (await _googleSignIn.isSignedIn()) {
+        await _googleSignIn.signOut();
+      }
+
+      final user = await _googleSignIn.signIn();
+      if (user == null) {
+        _errorMessage = 'Sign-in canceled by user';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final auth = await user.authentication;
+
+      // Kirim ke backend untuk verifikasi
+      final url = Uri.parse('${dotenv.env['API_BASE_URL']}/auth/google');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'idToken': auth.idToken,
+          'accessToken': auth.accessToken,
+          'email': user.email,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300 && data['token'] != null) {
+        _token = data['token'];
+        // _user = User.fromJson(data['user']);
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', _token!);
+        // await prefs.setString('user', jsonEncode(_user!.toJson()));
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = 'Server verification failed';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'Google Sign-In error: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
 }

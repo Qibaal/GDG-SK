@@ -57,7 +57,6 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 24),
                   _buildAnswerBox(),
                   _buildDestinationDetails(),
                 ],
@@ -114,7 +113,7 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
       ),
     );
   }
-
+  bool isLiked = false;
   Widget _buildDestinationDetails() {
     final dest = data['destination'] as Map<String, dynamic>;
     final details = data['details'] as Map<String, dynamic>;
@@ -138,7 +137,7 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
           Row(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(dest['image']),
+                backgroundImage: AssetImage('assets/city.png'),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -160,8 +159,15 @@ class _SearchResultPageState extends State<SearchResultPage> with SingleTickerPr
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.favorite_border, color: Colors.grey),
-                onPressed: () {},
+                icon: Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_border,
+                  color: isLiked ? Colors.red : Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isLiked = !isLiked;
+                  });
+                },
               ),
             ],
           ),

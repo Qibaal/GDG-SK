@@ -5,7 +5,25 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiService {
   final String baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8081';
   
-  Future<Map<String, dynamic>> postSearchHandler(String prompt, String token, String origin) async {
+  Future<Map<String, dynamic>> getUserSearchResult(String prompt, String token, String origin) async {
+    final url = Uri.parse('$baseUrl/dummy-search');
+    final resp = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'origin': origin, 
+        'prompt': prompt
+      }),
+    );
+    
+    if (resp.statusCode == 200) return jsonDecode(resp.body);
+    throw Exception('Search-handler failed (${resp.statusCode})');
+  }
+
+  Future<Map<String, dynamic>> getUserTripPlan(String prompt, String token, String origin) async {
     final url = Uri.parse('$baseUrl/dummy-search');
     final resp = await http.post(
       url,

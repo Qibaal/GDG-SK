@@ -92,7 +92,7 @@ class _SearchBarState extends State<SearchBar> {
     setState(() => _isLoading = true);
 
     try {
-      final resultData = await _api.postSearchHandler(query, token, widget.origin);
+      final resultData = await _api.getUserSearchResult(query, token, widget.origin);
       if (!mounted) return;
       Navigator.push(
         context,

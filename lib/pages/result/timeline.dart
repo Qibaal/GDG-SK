@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TimelinePage extends StatelessWidget {
+  final Map<String, dynamic> resultData;
+  const TimelinePage({super.key, required this.resultData});
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +14,17 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: 'Roboto',
       ),
-      home: const TravelPlannerScreen(),
+      home: TravelPlannerScreen(resultData: resultData),
     );
   }
 }
 
 class TravelPlannerScreen extends StatefulWidget {
-  const TravelPlannerScreen({super.key});
+  final Map<String, dynamic> resultData;
+  const TravelPlannerScreen({
+    super.key,
+    required this.resultData,
+  });
 
   @override
   State<TravelPlannerScreen> createState() => _TravelPlannerScreenState();
@@ -37,137 +38,19 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
   @override
   void initState() {
     super.initState();
-    // This would be replaced with actual API call to fetch data
-    _loadTripData();
-  }
-  
-  void _loadTripData() {
-    // Mock data - this would come from your JSON backend
-    final mockData = {
-      "tripName": " Jakarta ",
-      "days": [
-        {
-          "date": "2025-03-30",
-          "activities": [
-            {
-              "type": "FLIGHT",
-              "title": "Flight",
-              "time": "8:30 AM",
-              "details": {
-                "from": "Los Angeles",
-                "to": "Vancouver"
-              }
-            },
-            {
-              "type": "HOTEL",
-              "title": "Hotel",
-              "time": "11:00 AM",
-              "details": {
-                "action": "Rest"
-              }
-            },
-            {
-              "type": "ACTIVITY",
-              "title": "Douglas Park",
-              "time": "4:00 PM",
-              "details": {
-                "action": "Walk"
-              }
-            },
-            {
-              "type": "EXCURSION",
-              "title": "Lynn Canyon",
-              "time": "6:00 PM",
-              "details": {
-                "action": "Jeep Excursion"
-              }
-            },
-            {
-              "type": "LUNCH",
-              "title": "Lunch",
-              "time": "6:00 PM",
-              "details": {
-                "location": "Granville Island"
-              }
-            }
-          ]
-        },
-        {
-          "date": "2025-03-31",
-          "activities": [
-            {
-              "type": "BREAKFAST",
-              "title": "Breakfast",
-              "time": "8:00 AM",
-              "details": {
-                "location": "Hotel Restaurant"
-              }
-            },
-            {
-              "type": "ACTIVITY",
-              "title": "Stanley Park",
-              "time": "10:00 AM",
-              "details": {
-                "action": "Biking"
-              }
-            },
-            {
-              "type": "LUNCH",
-              "title": "Lunch",
-              "time": "1:00 PM",
-              "details": {
-                "location": "Granville Island"
-              }
-            }
-          ]
-        },
-        {
-          "date": "2025-04-01",
-          "activities": [
-            {
-              "type": "ACTIVITY",
-              "title": "Grouse Mountain",
-              "time": "9:00 AM",
-              "details": {
-                "action": "Hiking"
-              }
-            },
-            {
-              "type": "LUNCH",
-              "title": "Lunch",
-              "time": "12:30 PM",
-              "details": {
-                "location": "Mountain View Restaurant"
-              }
-            },
-            {
-              "type": "LUNCH",
-              "title": "Lunch",
-              "time": "12:30 PM",
-              "details": {
-                "location": "Mountain View Restaurant"
-              }
-            }
-          ]
-        }
-      ]
-    };
-    
-    _parseTripData(mockData);
-  }
-  
-  void _parseTripData(Map<String, dynamic> data) {
-    _tripName = data['tripName'] as String;
-    _tripDays = (data['days'] as List).map((dayData) {
-      final date = DateTime.parse(dayData['date']);
-      final activities = (dayData['activities'] as List).map((activityData) {
-        return Activity.fromJson(activityData);
-      }).toList();
-      
-      return TripDay(date: date, activities: activities);
+    // parse the JSON you already have:
+    _tripName = widget.resultData['tripName'] as String? ?? '';
+    _tripDays = (widget.resultData['days'] as List<dynamic>)
+        .cast<Map<String, dynamic>>()
+        .map((dayMap) {
+      final date = DateTime.parse(dayMap['date'] as String);
+      final budget = Budget.fromJson(dayMap['budget'] as Map<String, dynamic>);
+      final activities = (dayMap['activities'] as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .map(Activity.fromJson)
+          .toList();
+      return TripDay(date: date, activities: activities, budget: budget);
     }).toList();
-    
-    setState(() {});
   }
 
   @override
@@ -185,7 +68,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
           '${_tripName}Trip Plan',
           style: TextStyle(
             color: Colors.black,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
@@ -193,6 +76,7 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
       body: Column(
         children: [
           _buildDaySelection(),
+          _buildBudgetSection(),
           Expanded(
             child: _buildTimeline(),
           ),
@@ -263,55 +147,166 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
     );
   }
 
-  Widget _buildTimeline() {
-  final selectedDay = _tripDays[_selectedDayIndex];
-  
-  return ListView.builder(
-    padding: const EdgeInsets.all(16),
-    itemCount: selectedDay.activities.length,
-    itemBuilder: (context, index) {
-      final activity = selectedDay.activities[index];
-      final isFirst = index == 0;
-      final isLast = index == selectedDay.activities.length - 1;
-      
-      return IntrinsicHeight(                                      // ①
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,         // ②
-          children: [
-            // ─── Timeline column ────────────────────────────────
-            SizedBox(
-              width: 30,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  // Top line
-                  if (!isFirst)
-                    SizedBox(
-                      width: 2,
-                      child: CustomPaint(
-                        painter: DashedLinePainter(
-                          color: Color(0xFFE67E22),
-                          dashLength: 3,
-                          dashGap: 3,
-                        ),
-                      ),
-                    ),
-                  
-                  // Dot
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFE67E22),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
+  Widget _buildBudgetSection() {
+    final selectedDay = _tripDays[_selectedDayIndex];
+    final budget = selectedDay.budget;
+    
+    // Format currency
+    final formatter = NumberFormat('#,###', 'id_ID');
+    final formattedTotal = formatter.format(budget.amount);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Daily Budget / Person',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '${budget.currency} ${formattedTotal}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFE67E22),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Accommodation',
+                  budget.categories['accommodation'] ?? 0,
+                  budget.currency,
+                  Icons.hotel,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Food',
+                  budget.categories['food'] ?? 0,
+                  budget.currency,
+                  Icons.restaurant,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Transport',
+                  budget.categories['transportation'] ?? 0,
+                  budget.currency,
+                  Icons.directions_car,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildBudgetCategoryCard(
+                  'Activities',
+                  budget.categories['activities'] ?? 0,
+                  budget.currency,
+                  Icons.hiking,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBudgetCategoryCard(String title, int amount, String currency, IconData icon) {
+    // Format currency
+    final formatter = NumberFormat('#,###', 'id_ID');
+    final formattedAmount = formatter.format(amount);
+    
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Color(0xFFF8F8F8),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Color(0xFFE67E22).withAlpha((0.1*255).toInt()),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 16,
+              color: Color(0xFFE67E22),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
-                  
-                  // Bottom line grows to fill rest of the row
-                  if (!isLast)
-                    Expanded(                                       // ③
-                      child: SizedBox(
+                ),
+                Text(
+                  '${currency} ${formattedAmount}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeline() {
+    final selectedDay = _tripDays[_selectedDayIndex];
+    
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: selectedDay.activities.length,
+      itemBuilder: (context, index) {
+        final activity = selectedDay.activities[index];
+        final isFirst = index == 0;
+        final isLast = index == selectedDay.activities.length - 1;
+        
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ─── Timeline column ────────────────────────────────
+              SizedBox(
+                width: 30,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    // Top line
+                    if (!isFirst)
+                      SizedBox(
                         width: 2,
                         child: CustomPaint(
                           painter: DashedLinePainter(
@@ -321,27 +316,51 @@ class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
                           ),
                         ),
                       ),
+                    
+                    // Dot
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE67E22),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
                     ),
-                ],
+                    
+                    // Bottom line grows to fill rest of the row
+                    if (!isLast)
+                      Expanded(
+                        child: SizedBox(
+                          width: 2,
+                          child: CustomPaint(
+                            painter: DashedLinePainter(
+                              color: Color(0xFFE67E22),
+                              dashLength: 3,
+                              dashGap: 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            
-            const SizedBox(width: 16),
-            
-            // ─── Activity card ────────────────────────────────────
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
-                child: _buildActivityCard(activity),
+              
+              const SizedBox(width: 16),
+              
+              // ─── Activity card ────────────────────────────────────
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
+                  child: _buildActivityCard(activity),
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
+            ],
+          ),
+        );
+      },
+    );
   }
-
 
   Color _getActivityColor(String type) {
     switch (type) {
@@ -514,8 +533,33 @@ class DashedLinePainter extends CustomPainter {
 class TripDay {
   final DateTime date;
   final List<Activity> activities;
+  final Budget budget;
   
-  TripDay({required this.date, required this.activities});
+  TripDay({
+    required this.date, 
+    required this.activities,
+    required this.budget,
+  });
+}
+
+class Budget {
+  final int amount;
+  final String currency;
+  final Map<String, int> categories;
+  
+  Budget({
+    required this.amount,
+    required this.currency,
+    required this.categories,
+  });
+  
+  factory Budget.fromJson(Map<String, dynamic> json) {
+    return Budget(
+      amount: json['amount'],
+      currency: json['currency'],
+      categories: Map<String, int>.from(json['categories']),
+    );
+  }
 }
 
 class Activity {
@@ -538,23 +582,5 @@ class Activity {
       time: json['time'],
       details: json['details'],
     );
-  }
-}
-
-// To connect with a real backend, you would use something like:
-class TripService {
-  static Future<Map<String, dynamic>> fetchTripData(String tripId) async {
-    // Using your preferred HTTP client (http, dio, etc.)
-    // final response = await http.post(Uri.parse('https://your-api.com/trips/$tripId'));
-    // return jsonDecode(response.body);
-    
-    // Mock implementation for example
-    await Future.delayed(const Duration(seconds: 1));
-    return {
-      "tripName": "Canada trip plan",
-      "days": [
-        // Your data here...
-      ]
-    };
   }
 }

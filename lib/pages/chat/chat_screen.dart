@@ -5,11 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:gemexplora/providers/auth_provider.dart';
 import 'search_bar.dart';
 import 'chat_history_preview.dart';
-import 'tab_navigation.dart';
 import 'tabbar/trending_tab.dart';
-import 'tabbar/food_tab.dart';
-import 'tabbar/stays_tab.dart';
-import 'tabbar/events_tab.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -19,14 +15,12 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+  with SingleTickerProviderStateMixin {
   String? _origin;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
     _initOrigin();
 
     // Log token & origin once at startup
@@ -115,7 +109,6 @@ class _ChatScreenState extends State<ChatScreen>
 
   @override
   void dispose() {
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -179,29 +172,9 @@ class _ChatScreenState extends State<ChatScreen>
                     ),
                   ),
                 ),
-
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(48),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8
-                    ),
-                    child: TabNavigation(
-                      tabController: _tabController,
-                    ),
-                  ),
-                ),
               ),
             ],
-            body: TabBarView(
-              controller: _tabController,
-              children: const [
-                TrendingTab(),
-                FoodTab(),
-                StaysTab(),
-                EventsTab(),
-              ],
-            ),
+            body: const TrendingTab(),
           ),
         ]),
       ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gemexplora/pages/result/timeline.dart';
 
 // KEEP IMPORTS AND CLASS SIGNATURE
 class SearchResultPage extends StatefulWidget {
+  
   final Map<String, dynamic> resultData;
 
   const SearchResultPage({
@@ -13,8 +15,13 @@ class SearchResultPage extends StatefulWidget {
   State<SearchResultPage> createState() => _SearchResultPageState();
 }
 
-class _SearchResultPageState extends State<SearchResultPage>
-    with SingleTickerProviderStateMixin {
+class _SearchResultPageState extends State<SearchResultPage> with SingleTickerProviderStateMixin {
+  Map<String, dynamic> get data {
+    return widget.resultData.containsKey('Response')
+      ? data['Response'] as Map<String, dynamic>
+      : widget.resultData;
+  }
+
   late TabController _tabController;
 
   @override
@@ -31,23 +38,30 @@ class _SearchResultPageState extends State<SearchResultPage>
 
   @override
   Widget build(BuildContext context) {
+    final isTimeline = (data['isTimeLine'] as bool?) ?? false;
+    if (isTimeline) {
+      // when isTimeLine == true, show your timeline screen
+      return TimelinePage(resultData: data);
+    }
+
+    // otherwise fall back to the existing “cards + tabs” UI
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            _buildAppBar(), // KEEP THIS METHOD
+            _buildAppBar(),
             SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 24),
-                  _buildAnswerBox(), // UPDATED TO USE resultData
-                  _buildDestinationDetails(), // UPDATED TO USE resultData
+                  _buildAnswerBox(),
+                  _buildDestinationDetails(),
                 ],
               ),
             ),
             SliverFillRemaining(
-              child: _buildTabView(), // KEEP THIS METHOD
+              child: _buildTabView(),
             ),
           ],
         ),
@@ -75,7 +89,7 @@ class _SearchResultPageState extends State<SearchResultPage>
   }
 
   Widget _buildAnswerBox() {
-    final firstResp = widget.resultData['firstResponse'] as String;
+    final firstResp = data['firstResponse'] as String;
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -109,8 +123,8 @@ class _SearchResultPageState extends State<SearchResultPage>
   }
 
   Widget _buildDestinationDetails() {
-    final dest = widget.resultData['destination'] as Map<String, dynamic>;
-    final details = widget.resultData['details'] as Map<String, dynamic>;
+    final dest = data['destination'] as Map<String, dynamic>;
+    final details = data['details'] as Map<String, dynamic>;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -344,103 +358,57 @@ class _SearchResultPageState extends State<SearchResultPage>
   }
 
   Widget _buildHotelList() {
+    final hotels = List<Map<String,dynamic>>.from(data['hotels']);
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: 5,
-      itemBuilder: (context, index) {
+      itemCount: hotels.length,
+      itemBuilder: (context, i) {
+        final h = hotels[i];
         return _buildRecommendationCard(
-          imageUrl: 'https://picsum.photos/300/200?random=${10 + index}',
-          title: 'Papua Paradise Eco Resort',
-          rating: 4.8,
-          price: 'IDR 3,500,000/night',
-          tagLine: 'Luxury | Beachfront | Free Breakfast',
-          featureList: const [
-            'Private beach access',
-            'Diving center',
-            'Infinity pool'
-          ],
+          imageUrl:   h['image'],
+          title:      h['title'],
+          rating:     (h['rating'] as num).toDouble(),
+          price:      h['price'],
+          tagLine:    h['tagLine'],
+          featureList: List<String>.from(h['features']),
         );
       },
     );
   }
 
   Widget _buildFoodList() {
+    final foods = List<Map<String,dynamic>>.from(data['foods']);
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        List<String> restaurants = [
-          'Coco Beach Restaurant',
-          'Kali Seafood',
-          'Warung Papua',
-          'Blue Paradise',
-          'Sago Delights',
-        ];
-        
-        List<String> cuisines = [
-          'Seafood | Local',
-          'Fresh Fish | BBQ',
-          'Traditional | Budget-friendly',
-          'International | Fusion',
-          'Desserts | Coffee',
-        ];
-        
-        List<List<String>> features = [
-          ['Beachfront dining', 'Fresh catch daily', 'Sunset views'],
-          ['Local recipes', 'Family-owned', 'Authentic dishes'],
-          ['Budget meals', 'Home cooking', 'Local specialties'],
-          ['Fusion cuisine', 'Cocktail bar', 'Live music'],
-          ['Traditional sweets', 'Artisan coffee', 'Vegan options'],
-        ];
-        
+      itemCount: foods.length,
+      itemBuilder: (context, i) {
+        final f = foods[i];
         return _buildRecommendationCard(
-          imageUrl: 'https://picsum.photos/300/200?random=${20 + index}',
-          title: restaurants[index],
-          rating: 4.5 - (index * 0.1),
-          price: '${index + 1}\$\$ • 15-30 mins',
-          tagLine: cuisines[index],
-          featureList: features[index],
+          imageUrl:   f['image'],
+          title:      f['title'],
+          rating:     (f['rating'] as num).toDouble(),
+          price:      f['price'],
+          tagLine:    f['tagLine'],
+          featureList: List<String>.from(f['features']),
         );
       },
     );
   }
 
   Widget _buildAttractionsList() {
+    final attractions = List<Map<String,dynamic>>.from(data['attractions']);
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        List<String> attractions = [
-          'Piaynemo Viewpoint',
-          'Kabui Bay',
-          'Misool Island',
-          'Wayag Island',
-          'Blue River',
-        ];
-        
-        List<String> types = [
-          'Natural Landmark | Photography',
-          'Hidden Bay | Boat Tour',
-          'Marine Reserve | Diving',
-          'Island Tour | Hiking',
-          'Eco Tour | Swimming',
-        ];
-        
-        List<List<String>> features = [
-          ['Iconic viewpoint', 'Island hopping', 'Sunset spot'],
-          ['Limestone cliffs', 'Clear waters', 'Cave exploration'],
-          ['Marine diversity', 'Coral reefs', 'Beach camping'],
-          ['Pristine beaches', 'Lagoons', 'Rock islands'],
-          ['Natural pools', 'Jungle trek', 'Bird watching'],
-        ];
-        
+      itemCount: attractions.length,
+      itemBuilder: (context, i) {
+        final a = attractions[i];
         return _buildRecommendationCard(
-          imageUrl: 'https://picsum.photos/300/200?random=${30 + index}',
-          title: attractions[index],
-          rating: 4.9 - (index * 0.1),
-          price: index == 0 ? 'Premium Entry' : 'IDR ${(index + 1) * 50},000',
-          tagLine: types[index],
-          featureList: features[index],
+          imageUrl:   a['image'],
+          title:      a['title'],
+          rating:     (a['rating'] as num).toDouble(),
+          price:      a['price'],
+          tagLine:    a['tagLine'],
+          featureList: List<String>.from(a['features']),
         );
       },
     );

@@ -39,6 +39,7 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_secure_storage : ^9.0.0
   device_info_plus: ^9.0.2
+  flutter_dotenv: ^5.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -72,7 +73,7 @@ flutter:
   assets:
     - assets/apple.png
     - assets/google.png
-    - assets/shibuya.png
+    - .env
     # - assets/data/history_data.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
